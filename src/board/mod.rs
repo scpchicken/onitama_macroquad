@@ -45,7 +45,7 @@ impl Board {
     for (curr_player_piece_coord, piece_move) in curr_player_move_vec.iter() {
       for (card, coord_vec) in piece_move.iter() {
         for i in coord_vec.iter() {
-          if i == &(Coord {i: ind, j: jnd}) {
+          if i == &(Coord { i: ind, j: jnd }) {
             // let mut bruh = card::Card::Dragon;
 
             // for c in Card::iter() {
@@ -135,12 +135,12 @@ impl Board {
     let blue_temple_arch = self.at_pos(BLUE_TEMPLE_ARCH_POS);
     let red_temple_arch = self.at_pos(RED_TEMPLE_ARCH_POS);
 
-    if (curr_player == piece::Colour::Red &&
-      blue_temple_arch.name == piece::Name::Master &&
-      blue_temple_arch.colour == curr_player) ||
-      (curr_player == piece::Colour::Blue &&
-        red_temple_arch.name == piece::Name::Master &&
-        red_temple_arch.colour == curr_player)
+    if (curr_player == piece::Colour::Red
+      && blue_temple_arch.name == piece::Name::Master
+      && blue_temple_arch.colour == curr_player)
+      || (curr_player == piece::Colour::Blue
+        && red_temple_arch.name == piece::Name::Master
+        && red_temple_arch.colour == curr_player)
     {
       println!("{:?} wins by way of stream", curr_player);
       return true;

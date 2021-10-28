@@ -72,11 +72,11 @@ impl Piece {
               j - 2
             } + self.coord.j as isize;
 
-            if offset_i >= 0 &&
-              offset_i < 5 &&
-              offset_j >= 0 &&
-              offset_j < 5 &&
-              board.board[offset_i as usize][offset_j as usize].colour != self.colour
+            if offset_i >= 0
+              && offset_i < 5
+              && offset_j >= 0
+              && offset_j < 5
+              && board.board[offset_i as usize][offset_j as usize].colour != self.colour
             {
               move_vec.push(piece::Coord {
                 i: offset_i as usize,
