@@ -95,212 +95,185 @@ async fn main() {
 
     clear_background(BLUE);
 
-    let can_die_vec = board.clone().board.iter()
-      .map(|piece_line| {
-        piece_line.iter()
-          .map(|piece| board.contains_move(piece.coord.i, piece.coord.j, curr_player_move_vec.clone()))
-          .collect::<Vec<bool>>()
-      })
-      .collect::<Vec<Vec<bool>>>();
-
-    let board_vec = board.clone().board;
-    let board_vec_rev = board.clone().board.into_iter().map(|piece_line| piece_line.into_iter().rev().collect::<Vec<piece::Piece>>()).rev().collect::<Vec<_>>();
-
-    for (ind, piece_line) in (0..).zip(if curr_player == piece::Colour::Red {board_vec.iter()} else {board_vec_rev.iter()}) {
-      for (jnd, piece) in (0..).zip(piece_line.iter()) {
-        // let ind = piece.coord.i;
-        // let jnd = piece.coord.j;
-        // let piece = &board.board[ind][jnd];
-        let pos = &button_pos_vec[ind][jnd];
-        if widgets::Button::new(
-          // get_piece_image(piece_char, selected_pos.clone(), ind, jnd).await
-          // if selected_pos == (piece::Coord {i: ind, j: jnd}) {
-          match (piece.name, piece.colour) {
-            (piece::Name::Pawn, piece::Colour::Blue) => [
-              blue_pawn_image,
-              blue_pawn_select_image,
-              blue_pawn_dead_image,
-            ],
-
-            (piece::Name::Master, piece::Colour::Blue) => [
-              blue_king_image,
-              blue_king_select_image,
-              blue_king_dead_image,
-            ],
-
-            (piece::Name::Pawn, piece::Colour::Red) => {
-              [red_pawn_image, red_pawn_select_image, red_pawn_dead_image]
-            }
-
-            (piece::Name::Master, piece::Colour::Red) => {
-              [red_king_image, red_king_select_image, red_king_dead_image]
-            }
-
-            _ => [empty_image, empty_image, empty_dead_image],
-          }[if board.contains_move(piece.coord.i, piece.coord.j, curr_player_move_vec.clone()) {
-            2
-          }
-          // if curr_player_move_vec.contains(&piece::Coord {i: ind, j: jnd})
-          else if selected_pos == (piece::Coord { i: piece.coord.i, j: piece.coord.j }) {
-            1
-          } else {
-            0
-          }], // get_piece_image(piece_char, selected_pos, ind, jnd)
-        )
-        .size(vec2(50., 50.))
-        .position(vec2(pos.j, pos.i))
-        .ui(&mut *root_ui())
-        {
-          // println!("yo uclick button
-
-          // println!("charlie");
-          if can_die_vec[piece.coord.i][piece.coord.j] {
-            println!("charlie");
-
-            board.move_piece(selected_pos, piece::Coord { i: piece.coord.i, j: piece.coord.j });
-
-            selected_pos = piece::Coord { i: 69, j: 69 };
-            curr_player_move_vec = vec![];
-
-            way_of_stream = board.way_of_stream(curr_player);
-            way_of_stone = board.way_of_stone(curr_player, opponent_player);
-
-            // if board.way_of_stone() {
-
-            // }
-            // if board.way_of_stone(curr_player, opponent_player) || board.way_of_stream(curr_player)
-            // {
-            //   still_playing = false;
-            //   // still_playing = false;
-            //   // break;
-            // }
-
-            mem::swap(&mut curr_player, &mut opponent_player);
-            mem::swap(&mut player_one_card_vec[curr_select_card], &mut middle_card);
-            mem::swap(&mut player_one_card_vec, &mut player_two_card_vec);
-          } else {
-
-            println!("reg move");
-            selected_pos = piece::Coord { i: piece.coord.i, j: piece.coord.j };
-
-            curr_player_move_vec = vec![];
-
-            // println!("{}", )
-
-            // println!("current player is {:?}", curr_player);
-
-            // println!("{:#?}", board.board[0]);
-
-            // let mut curr_player_move_vec: Vec<(piece::Coord, Vec<(&Card, Vec<piece::Coord>)>)> = vec![];
-            for piece_line in board.board.iter() {
-              for piece in piece_line.iter() {
-                if piece.colour == curr_player && piece.coord == selected_pos {
-                  let mut move_vec: Vec<(&Card, Vec<piece::Coord>)> = vec![];
-
-                  let card = player_one_card_vec[curr_select_card];
-                  move_vec.push((card, piece.get_move_vec(&board, card.value())));
-                  curr_player_move_vec.push((piece.coord.clone(), move_vec))
-                }
-              }
-            }
-
-            println!("new movevec: {:?}", curr_player_move_vec);
-          }
-        }
-      }
-    }
-
-    let old_select_card = curr_select_card;
-
-    if root_ui().button(vec2(100., 400.), format!("{:?}", player_one_card_vec[0])) {
-      curr_select_card = 0;
-    }
-
-    if root_ui().button(vec2(200., 400.), format!("{:?}", player_one_card_vec[1])) {
-      curr_select_card = 1;
-    }
-
-    if curr_select_card != old_select_card {
-
-      println!("new card bruh");
-      // selected_pos = piece::Coord { i: ind, j: jnd };
-
-      curr_player_move_vec = vec![];
-
-      // let mut curr_player_move_vec: Vec<(piece::Coord, Vec<(&Card, Vec<piece::Coord>)>)> = vec![];
-      for piece_line in board.board.iter() {
-        for piece in piece_line.iter() {
-          if piece.colour == curr_player && piece.coord == selected_pos {
-            let mut move_vec: Vec<(&Card, Vec<piece::Coord>)> = vec![];
-
-            let card = player_one_card_vec[curr_select_card];
-            move_vec.push((card, piece.get_move_vec(&board, card.value())));
-            curr_player_move_vec.push((piece.coord.clone(), move_vec))
-          }
-        }
-      }
-    }
-    // vec2(100., 450.)
-    draw_rectangle(100., 450., 200., 30., GRAY);
-    widgets::Label::new(format!("Selected: {:?}", player_one_card_vec[curr_select_card])).position(vec2(100., 450.)).ui(&mut *root_ui());
-
-    draw_rectangle(400., 200., 200., 30., GRAY);
-    widgets::Label::new(format!("Middle Card: {:?}", middle_card)).position(vec2(400., 200.)).ui(&mut *root_ui());
-
-    draw_rectangle(100., 25., 100., 30., GRAY);
-    widgets::Label::new(format!("{:?}", player_two_card_vec[0])).position(vec2(100., 25.)).ui(&mut *root_ui());
-
-    draw_rectangle(200., 25., 100., 30., GRAY);
-    widgets::Label::new(format!("{:?}", player_two_card_vec[1])).position(vec2(200., 25.)).ui(&mut *root_ui());
-
-    if is_key_down(KeyCode::Escape) {
-      selected_pos = piece::Coord { i: 69, j: 69 };
-      curr_player_move_vec = vec![];
-    }
-
     // draw_rectangle()
 
-    // if way_of_stream {
+    if way_of_stream || way_of_stone {
+      draw_rectangle(250., 250., 100., 200., GRAY);
+      widgets::Label::new(format!("{:?} wins :O", opponent_player)).position(vec2(250., 250.)).ui(&mut *root_ui());
+      // widgets::Label::new(format!("{:?}", player_two_card_vec[1])).position(vec2(200., 25.)).ui(&mut *root_ui());
+
       // widgets::Button::new(
       //   empty_image
       // )
       //   .size(vec2(100., 30.))
       //   .position(vec2(250., 250.))
       //   .ui(&mut *root_ui());
-          // get_piece_image(piece_char, selected_pos.clone(), ind, jnd).await
-          // if selected_pos == (piece::Coord {i: ind, j: jnd}) {
-          // match (piece.name, piece.colour) {
-          //   (piece::Name::Pawn, piece::Colour::Blue) => [
-          //     blue_pawn_image,
-          //     blue_pawn_select_image,
-          //     blue_pawn_dead_image,
-          //   ],
+    // } else if way_of_stone {
 
-          //   (piece::Name::Master, piece::Colour::Blue) => [
-          //     blue_king_image,
-          //     blue_king_select_image,
-          //     blue_king_dead_image,
-          //   ],
+    } else {
+      let can_die_vec = board.clone().board.iter()
+        .map(|piece_line| {
+          piece_line.iter()
+            .map(|piece| board.contains_move(piece.coord.i, piece.coord.j, curr_player_move_vec.clone()))
+            .collect::<Vec<bool>>()
+        })
+        .collect::<Vec<Vec<bool>>>();
 
-          //   (piece::Name::Pawn, piece::Colour::Red) => {
-          //     [red_pawn_image, red_pawn_select_image, red_pawn_dead_image]
-          //   }
+      let board_vec = board.clone().board;
+      let board_vec_rev = board.clone().board.into_iter().map(|piece_line| piece_line.into_iter().rev().collect::<Vec<piece::Piece>>()).rev().collect::<Vec<_>>();
 
-          //   (piece::Name::Master, piece::Colour::Red) => {
-          //     [red_king_image, red_king_select_image, red_king_dead_image]
-          //   }
+      for (ind, piece_line) in (0..).zip(if curr_player == piece::Colour::Red {board_vec.iter()} else {board_vec_rev.iter()}) {
+        for (jnd, piece) in (0..).zip(piece_line.iter()) {
+          // let ind = piece.coord.i;
+          // let jnd = piece.coord.j;
+          // let piece = &board.board[ind][jnd];
+          let pos = &button_pos_vec[ind][jnd];
+          if widgets::Button::new(
+            // get_piece_image(piece_char, selected_pos.clone(), ind, jnd).await
+            // if selected_pos == (piece::Coord {i: ind, j: jnd}) {
+            match (piece.name, piece.colour) {
+              (piece::Name::Pawn, piece::Colour::Blue) => [
+                blue_pawn_image,
+                blue_pawn_select_image,
+                blue_pawn_dead_image,
+              ],
 
-          //   _ => [empty_image, empty_image, empty_dead_image],
-          // }[if board.contains_move(piece.coord.i, piece.coord.j, curr_player_move_vec.clone()) {
-          //   2
-          // }
-          // // if curr_player_move_vec.contains(&piece::Coord {i: ind, j: jnd})
-          // else if selected_pos == (piece::Coord { i: piece.coord.i, j: piece.coord.j }) {
-          //   1
-          // } else {
-          //   0
-          // }], // get_piece_image(piece
-    // }
+              (piece::Name::Master, piece::Colour::Blue) => [
+                blue_king_image,
+                blue_king_select_image,
+                blue_king_dead_image,
+              ],
+
+              (piece::Name::Pawn, piece::Colour::Red) => {
+                [red_pawn_image, red_pawn_select_image, red_pawn_dead_image]
+              }
+
+              (piece::Name::Master, piece::Colour::Red) => {
+                [red_king_image, red_king_select_image, red_king_dead_image]
+              }
+
+              _ => [empty_image, empty_image, empty_dead_image],
+            }[if board.contains_move(piece.coord.i, piece.coord.j, curr_player_move_vec.clone()) {
+              2
+            }
+            // if curr_player_move_vec.contains(&piece::Coord {i: ind, j: jnd})
+            else if selected_pos == (piece::Coord { i: piece.coord.i, j: piece.coord.j }) {
+              1
+            } else {
+              0
+            }], // get_piece_image(piece_char, selected_pos, ind, jnd)
+          )
+          .size(vec2(50., 50.))
+          .position(vec2(pos.j, pos.i))
+          .ui(&mut *root_ui())
+          {
+            // println!("yo uclick button
+
+            // println!("charlie");
+            if can_die_vec[piece.coord.i][piece.coord.j] {
+              println!("charlie");
+
+              board.move_piece(selected_pos, piece::Coord { i: piece.coord.i, j: piece.coord.j });
+
+              selected_pos = piece::Coord { i: 69, j: 69 };
+              curr_player_move_vec = vec![];
+
+              way_of_stream = board.way_of_stream(curr_player);
+              way_of_stone = board.way_of_stone(curr_player, opponent_player);
+
+              // if board.way_of_stone() {
+
+              // }
+              // if board.way_of_stone(curr_player, opponent_player) || board.way_of_stream(curr_player)
+              // {
+              //   still_playing = false;
+              //   // still_playing = false;
+              //   // break;
+              // }
+
+              mem::swap(&mut curr_player, &mut opponent_player);
+              mem::swap(&mut player_one_card_vec[curr_select_card], &mut middle_card);
+              mem::swap(&mut player_one_card_vec, &mut player_two_card_vec);
+            } else {
+
+              println!("reg move");
+              selected_pos = piece::Coord { i: piece.coord.i, j: piece.coord.j };
+
+              curr_player_move_vec = vec![];
+
+              // println!("{}", )
+
+              // println!("current player is {:?}", curr_player);
+
+              // println!("{:#?}", board.board[0]);
+
+              // let mut curr_player_move_vec: Vec<(piece::Coord, Vec<(&Card, Vec<piece::Coord>)>)> = vec![];
+              for piece_line in board.board.iter() {
+                for piece in piece_line.iter() {
+                  if piece.colour == curr_player && piece.coord == selected_pos {
+                    let mut move_vec: Vec<(&Card, Vec<piece::Coord>)> = vec![];
+
+                    let card = player_one_card_vec[curr_select_card];
+                    move_vec.push((card, piece.get_move_vec(&board, card.value())));
+                    curr_player_move_vec.push((piece.coord.clone(), move_vec))
+                  }
+                }
+              }
+
+              println!("new movevec: {:?}", curr_player_move_vec);
+            }
+          }
+        }
+      }
+
+      let old_select_card = curr_select_card;
+
+      if root_ui().button(vec2(100., 400.), format!("{:?}", player_one_card_vec[0])) {
+        curr_select_card = 0;
+      }
+
+      if root_ui().button(vec2(200., 400.), format!("{:?}", player_one_card_vec[1])) {
+        curr_select_card = 1;
+      }
+
+      if curr_select_card != old_select_card {
+
+        println!("new card bruh");
+        // selected_pos = piece::Coord { i: ind, j: jnd };
+
+        curr_player_move_vec = vec![];
+
+        // let mut curr_player_move_vec: Vec<(piece::Coord, Vec<(&Card, Vec<piece::Coord>)>)> = vec![];
+        for piece_line in board.board.iter() {
+          for piece in piece_line.iter() {
+            if piece.colour == curr_player && piece.coord == selected_pos {
+              let mut move_vec: Vec<(&Card, Vec<piece::Coord>)> = vec![];
+
+              let card = player_one_card_vec[curr_select_card];
+              move_vec.push((card, piece.get_move_vec(&board, card.value())));
+              curr_player_move_vec.push((piece.coord.clone(), move_vec))
+            }
+          }
+        }
+      }
+      // vec2(100., 450.)
+      draw_rectangle(100., 450., 200., 30., GRAY);
+      widgets::Label::new(format!("Selected: {:?}", player_one_card_vec[curr_select_card])).position(vec2(100., 450.)).ui(&mut *root_ui());
+
+      draw_rectangle(400., 200., 200., 30., GRAY);
+      widgets::Label::new(format!("Middle Card: {:?}", middle_card)).position(vec2(400., 200.)).ui(&mut *root_ui());
+
+      draw_rectangle(100., 25., format!("{:?}", player_two_card_vec[0]).len() as f32 * 10., 30., GRAY);
+      widgets::Label::new(format!("{:?}", player_two_card_vec[0])).position(vec2(100., 25.)).ui(&mut *root_ui());
+
+      draw_rectangle(200., 25., format!("{:?}", player_two_card_vec[1]).len() as f32 * 10., 30., GRAY);
+      widgets::Label::new(format!("{:?}", player_two_card_vec[1])).position(vec2(200., 25.)).ui(&mut *root_ui());
+
+      if is_key_down(KeyCode::Escape) {
+        selected_pos = piece::Coord { i: 69, j: 69 };
+        curr_player_move_vec = vec![];
+      }
+    }
 
     // f ind % 5 == 0 {
 
