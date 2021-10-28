@@ -1,1 +1,0 @@
-E:\Documents\GitHub\quadneo\target\debug\quadneo.exe: E:\Documents\GitHub\quadneo\src\board\mod.rs E:\Documents\GitHub\quadneo\src\card\mod.rs E:\Documents\GitHub\quadneo\src\global\mod.rs E:\Documents\GitHub\quadneo\src\main.rs E:\Documents\GitHub\quadneo\src\piece\mod.rs
