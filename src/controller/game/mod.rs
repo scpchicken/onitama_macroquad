@@ -58,10 +58,7 @@ pub async fn start() {
   loop {
     clear_background(BLUE);
     if game_over {
-      draw_rectangle(250., 250., 100., 200., GRAY);
-      Label::new(format!("{:?} wins :O", opponent_player))
-        .position(vec2(250., 250.))
-        .ui(&mut *root_ui());
+      graphics::draw_rect_label(250., 250., 100., 200., GRAY, format!("{:?} wins :O", opponent_player), vec2(250., 250.));
     } else {
       // let board::Board(board) = board;
 
@@ -200,40 +197,13 @@ pub async fn start() {
           }
         }
       }
-      draw_rectangle(100., 450., 200., 30., GRAY);
-      Label::new(format!(
-        "Selected: {:?}",
-        curr_player_card_vec[curr_select_card]
-      ))
-      .position(vec2(100., 450.))
-      .ui(&mut *root_ui());
 
-      draw_rectangle(400., 200., 200., 30., GRAY);
-      Label::new(format!("Middle card: {:?}", middle_card))
-        .position(vec2(400., 200.))
-        .ui(&mut *root_ui());
-
-      draw_rectangle(
-        100.,
-        25.,
-        format!("{:?}", opponent_player_card_vec[0]).len() as f32 * 10.,
-        30.,
-        GRAY,
+      graphics::draw_card_info(
+        curr_player_card_vec.clone(),
+        opponent_player_card_vec.clone(),
+        middle_card,
+        curr_select_card,
       );
-      Label::new(format!("{:?}", opponent_player_card_vec[0]))
-        .position(vec2(100., 25.))
-        .ui(&mut *root_ui());
-
-      draw_rectangle(
-        200.,
-        25.,
-        format!("{:?}", opponent_player_card_vec[1]).len() as f32 * 10.,
-        30.,
-        GRAY,
-      );
-      Label::new(format!("{:?}", opponent_player_card_vec[1]))
-        .position(vec2(200., 25.))
-        .ui(&mut *root_ui());
 
       if is_key_down(KeyCode::Escape) {
         selected_pos = piece::Coord { i: 69, j: 69 };
