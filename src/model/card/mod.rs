@@ -1,6 +1,6 @@
 use strum_macros::EnumIter;
 
-use crate::card::{Card::*, CardItem::*};
+use crate::model::card::{Card::*, CardItem::*};
 
 #[derive(Clone, Debug)]
 #[allow(dead_code)]

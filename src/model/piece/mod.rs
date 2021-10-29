@@ -1,8 +1,8 @@
 use std::fmt;
 
-use crate::board::*;
-use crate::card::*;
-use crate::piece;
+use crate::model::board::*;
+use crate::model::card::*;
+use crate::model::piece;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Piece {

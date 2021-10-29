@@ -1,5 +1,5 @@
 use crate::global::*;
-use crate::{piece, piece::*};
+use crate::model::{piece, piece::*};
 
 #[derive(Clone)]
 pub struct Board(pub Vec<Vec<Piece>>);

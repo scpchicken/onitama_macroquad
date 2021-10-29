@@ -1,11 +1,9 @@
-mod board;
-mod card;
-mod game;
+mod model;
+mod view;
+mod controller;
 mod global;
-mod graphics;
-mod piece;
 
 #[macroquad::main("UI showcase")]
 async fn main() {
-  game::start().await
+  controller::game::start().await
 }

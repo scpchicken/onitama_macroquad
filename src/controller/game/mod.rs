@@ -9,11 +9,11 @@ use ::rand::{seq::SliceRandom, thread_rng};
 use std::mem;
 use strum::IntoEnumIterator;
 
-use crate::board;
-use crate::card;
+use crate::model::board;
+use crate::model::card;
 use crate::global::*;
-use crate::graphics;
-use crate::piece;
+use crate::view::graphics;
+use crate::model::piece;
 
 #[derive(Debug, PartialEq)]
 struct Vecf {
