@@ -26,7 +26,7 @@ pub async fn start() {
 
   let mut card_vec: Vec<card::Card> = card::Card::iter().collect::<Vec<_>>();
   card_vec.shuffle(&mut thread_rng());
-  let (mut player_one_card_vec, mut player_two_card_vec, mut middle_card) = (
+  let (mut curr_player_card_vec, mut opponent_player_card_vec, mut middle_card) = (
     vec![&card_vec[0], &card_vec[1]],
     vec![&card_vec[2], &card_vec[3]],
     &card_vec[4],
@@ -152,8 +152,8 @@ pub async fn start() {
                 || board.way_of_stone(curr_player, opponent_player);
 
               mem::swap(&mut curr_player, &mut opponent_player);
-              mem::swap(&mut player_one_card_vec[curr_select_card], &mut middle_card);
-              mem::swap(&mut player_one_card_vec, &mut player_two_card_vec);
+              mem::swap(&mut curr_player_card_vec[curr_select_card], &mut middle_card);
+              mem::swap(&mut curr_player_card_vec, &mut opponent_player_card_vec);
             } else {
               selected_pos = piece::Coord {
                 i: piece.coord.i,
@@ -165,7 +165,7 @@ pub async fn start() {
               for piece_line in board.0.iter() {
                 for piece in piece_line.iter() {
                   if piece.colour == curr_player && piece.coord == selected_pos {
-                    let card = player_one_card_vec[curr_select_card];
+                    let card = curr_player_card_vec[curr_select_card];
                     curr_player_move_vec.push(piece.get_move_vec(&board, card.value()))
                   }
                 }
@@ -177,11 +177,11 @@ pub async fn start() {
 
       let old_select_card = curr_select_card;
 
-      if root_ui().button(vec2(100., 400.), format!("{:?}", player_one_card_vec[0])) {
+      if root_ui().button(vec2(100., 400.), format!("{:?}", curr_player_card_vec[0])) {
         curr_select_card = 0;
       }
 
-      if root_ui().button(vec2(200., 400.), format!("{:?}", player_one_card_vec[1])) {
+      if root_ui().button(vec2(200., 400.), format!("{:?}", curr_player_card_vec[1])) {
         curr_select_card = 1;
       }
 
@@ -191,7 +191,7 @@ pub async fn start() {
         for piece_line in board.0.iter() {
           for piece in piece_line.iter() {
             if piece.colour == curr_player && piece.coord == selected_pos {
-              let card = player_one_card_vec[curr_select_card];
+              let card = curr_player_card_vec[curr_select_card];
 
               curr_player_move_vec.push(piece.get_move_vec(&board, card.value()))
             }
@@ -201,7 +201,7 @@ pub async fn start() {
       draw_rectangle(100., 450., 200., 30., GRAY);
       Label::new(format!(
         "Selected: {:?}",
-        player_one_card_vec[curr_select_card]
+        curr_player_card_vec[curr_select_card]
       ))
       .position(vec2(100., 450.))
       .ui(&mut *root_ui());
@@ -214,22 +214,22 @@ pub async fn start() {
       draw_rectangle(
         100.,
         25.,
-        format!("{:?}", player_two_card_vec[0]).len() as f32 * 10.,
+        format!("{:?}", opponent_player_card_vec[0]).len() as f32 * 10.,
         30.,
         GRAY,
       );
-      Label::new(format!("{:?}", player_two_card_vec[0]))
+      Label::new(format!("{:?}", opponent_player_card_vec[0]))
         .position(vec2(100., 25.))
         .ui(&mut *root_ui());
 
       draw_rectangle(
         200.,
         25.,
-        format!("{:?}", player_two_card_vec[1]).len() as f32 * 10.,
+        format!("{:?}", opponent_player_card_vec[1]).len() as f32 * 10.,
         30.,
         GRAY,
       );
-      Label::new(format!("{:?}", player_two_card_vec[1]))
+      Label::new(format!("{:?}", opponent_player_card_vec[1]))
         .position(vec2(200., 25.))
         .ui(&mut *root_ui());
 
