@@ -30,12 +30,10 @@ pub async fn start() {
     &card_vec[4],
   );
 
-  // println!("curr: {:#?}", player_one_card_vec);
 
   let mut curr_player = piece::Colour::Red;
   let mut opponent_player = piece::Colour::Blue;
 
-  // let board_ref = ["bbBbb", ".....", ".....", ".....", "rrRrr"];
 
   let blue_pawn_image = load_texture("assets/blue_pawn.png").await.unwrap();
   let blue_pawn_select_image = load_texture("assets/blue_pawn_select.png").await.unwrap();
@@ -61,8 +59,7 @@ pub async fn start() {
   let mut way_of_stream = false;
   let mut way_of_stone = false;
 
-  // let mut can_move_pos_vec: Vec<piece::Coord> = vec![];
-  let mut curr_player_move_vec: Vec<(piece::Coord, Vec<(&card::Card, Vec<piece::Coord>)>)> = vec![];
+  let mut curr_player_move_vec: Vec<Vec<piece::Coord>> = vec![];
 
   let button_pos_vec = (0..5)
     .map(|ind| {
@@ -78,18 +75,17 @@ pub async fn start() {
 
   loop {
     clear_background(BLUE);
-
-    // draw_rectangle()
-
     if way_of_stream || way_of_stone {
       draw_rectangle(250., 250., 100., 200., GRAY);
       Label::new(format!("{:?} wins :O", opponent_player))
         .position(vec2(250., 250.))
         .ui(&mut *root_ui());
     } else {
+      // let board::Board(board) = board;
+
       let can_die_vec = board
         .clone()
-        .board
+        .as_vec()
         .iter()
         .map(|piece_line| {
           piece_line
@@ -101,10 +97,10 @@ pub async fn start() {
         })
         .collect::<Vec<Vec<bool>>>();
 
-      let board_vec = board.clone().board;
+      let board_vec = board.clone().as_vec();
       let board_vec_rev = board
         .clone()
-        .board
+        .as_vec()
         .into_iter()
         .map(|piece_line| piece_line.into_iter().rev().collect::<Vec<piece::Piece>>())
         .rev()
@@ -116,13 +112,8 @@ pub async fn start() {
         board_vec_rev.iter()
       }) {
         for (jnd, piece) in (0..).zip(piece_line.iter()) {
-          // let ind = piece.coord.i;
-          // let jnd = piece.coord.j;
-          // let piece = &board.board[ind][jnd];
           let pos = &button_pos_vec[ind][jnd];
           if Button::new(
-            // get_piece_image(piece_char, selected_pos.clone(), ind, jnd).await
-            // if selected_pos == (piece::Coord {i: ind, j: jnd}) {
             match (piece.name, piece.colour) {
               (piece::Name::Pawn, piece::Colour::Blue) => [
                 blue_pawn_image,
@@ -152,7 +143,6 @@ pub async fn start() {
             ) {
               2
             }
-            // if curr_player_move_vec.contains(&piece::Coord {i: ind, j: jnd})
             else if selected_pos
               == (piece::Coord {
                 i: piece.coord.i,
@@ -162,17 +152,14 @@ pub async fn start() {
               1
             } else {
               0
-            }], // get_piece_image(piece_char, selected_pos, ind, jnd)
+            }],
           )
           .size(vec2(50., 50.))
           .position(vec2(pos.j, pos.i))
           .ui(&mut *root_ui())
           {
-            // println!("yo uclick button
 
-            // println!("charlie");
             if can_die_vec[piece.coord.i][piece.coord.j] {
-              // println!("charlie");
 
               board.move_piece(
                 selected_pos,
@@ -192,25 +179,19 @@ pub async fn start() {
               mem::swap(&mut player_one_card_vec[curr_select_card], &mut middle_card);
               mem::swap(&mut player_one_card_vec, &mut player_two_card_vec);
             } else {
-              // println!("reg move");
               selected_pos = piece::Coord {
                 i: piece.coord.i,
                 j: piece.coord.j,
               };
 
-              for piece_line in board.board.iter() {
+              for piece_line in board.as_vec().iter() {
                 for piece in piece_line.iter() {
                   if piece.colour == curr_player && piece.coord == selected_pos {
-                    let mut move_vec: Vec<(&card::Card, Vec<piece::Coord>)> = vec![];
-
                     let card = player_one_card_vec[curr_select_card];
-                    move_vec.push((card, piece.get_move_vec(&board, card.value())));
-                    curr_player_move_vec.push((piece.coord.clone(), move_vec))
+                    curr_player_move_vec.push(piece.get_move_vec(&board, card.value()))
                   }
                 }
               }
-
-              // println!("new movevec: {:?}", curr_player_move_vec);
             }
           }
         }
@@ -227,25 +208,19 @@ pub async fn start() {
       }
 
       if curr_select_card != old_select_card {
-        // println!("new card bruh");
-        // selected_pos = piece::Coord { i: ind, j: jnd };
 
         curr_player_move_vec = vec![];
 
-        // let mut curr_player_move_vec: Vec<(piece::Coord, Vec<(&card::card::Card, Vec<piece::Coord>)>)> = vec![];
-        for piece_line in board.board.iter() {
+        for piece_line in board.as_vec().iter() {
           for piece in piece_line.iter() {
             if piece.colour == curr_player && piece.coord == selected_pos {
-              let mut move_vec: Vec<(&card::Card, Vec<piece::Coord>)> = vec![];
-
               let card = player_one_card_vec[curr_select_card];
-              move_vec.push((card, piece.get_move_vec(&board, card.value())));
-              curr_player_move_vec.push((piece.coord.clone(), move_vec))
+
+              curr_player_move_vec.push(piece.get_move_vec(&board, card.value()))
             }
           }
         }
       }
-      // vec2(100., 450.)
       draw_rectangle(100., 450., 200., 30., GRAY);
       Label::new(format!(
         "Selected: {:?}",
@@ -255,7 +230,7 @@ pub async fn start() {
       .ui(&mut *root_ui());
 
       draw_rectangle(400., 200., 200., 30., GRAY);
-      Label::new(format!("Middle card::Card: {:?}", middle_card))
+      Label::new(format!("Middle card: {:?}", middle_card))
         .position(vec2(400., 200.))
         .ui(&mut *root_ui());
 
