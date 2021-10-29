@@ -1,11 +1,18 @@
 use macroquad::prelude::*;
-use macroquad::ui::{root_ui, widgets::Label};
+use macroquad::ui::{
+  root_ui,
+  widgets::{Button, Label},
+};
 
 use regex::Regex;
 use std::collections::HashMap;
 use std::fs;
 
+use crate::controller::game;
+use crate::model::board;
 use crate::model::card;
+use crate::model::piece;
+use crate::view::graphics;
 
 pub async fn get_image_hash() -> HashMap<&'static str, Texture2D> {
   let image_name_regex = Regex::new(r"assets\\(.+?)\.png").unwrap();
@@ -86,4 +93,60 @@ pub fn draw_card_info(
     format!("{:?}", opponent_player_card_vec[1]),
     vec2(200., 25.),
   );
+}
+
+pub fn get_image(
+  selected_pos: piece::Coord,
+  piece: &piece::Piece,
+  curr_player_move_vec: Vec<piece::Coord>,
+  board: board::Board,
+  image_hash: HashMap<&'static str, Texture2D>,
+) -> Texture2D {
+  image_hash[&match (piece.name, piece.colour) {
+    (piece::Name::Pawn, piece::Colour::Blue) => ["blue_pawn", "blue_pawn_select", "blue_pawn_dead"],
+
+    (piece::Name::Master, piece::Colour::Blue) => {
+      ["blue_king", "blue_king_select", "blue_king_dead"]
+    }
+
+    (piece::Name::Pawn, piece::Colour::Red) => ["red_pawn", "red_pawn_select", "red_pawn_dead"],
+
+    (piece::Name::Master, piece::Colour::Red) => ["red_king", "red_king_select", "red_king_dead"],
+
+    _ => ["empty", "empty", "empty_dead"],
+  }[if board.contains_move(piece.coord.i, piece.coord.j, curr_player_move_vec.clone()) {
+    2
+  } else if selected_pos
+    == (piece::Coord {
+      i: piece.coord.i,
+      j: piece.coord.j,
+    })
+  {
+    1
+  } else {
+    0
+  }]]
+}
+
+pub fn piece_button<'a>(
+  selected_pos: piece::Coord,
+  piece: &piece::Piece,
+  curr_player_move_vec: Vec<piece::Coord>,
+  board: board::Board,
+  image_hash: HashMap<&'static str, Texture2D>,
+  button_pos_vec: Vec<Vec<game::Vecf>>,
+  ind: usize,
+  jnd: usize,
+) -> bool {
+  let pos = &button_pos_vec[ind][jnd];
+  Button::new(graphics::get_image(
+    selected_pos,
+    piece,
+    curr_player_move_vec.clone(),
+    board.clone(),
+    image_hash.clone(),
+  ))
+  .size(vec2(50., 50.))
+  .position(vec2(pos.j, pos.i))
+  .ui(&mut *root_ui())
 }

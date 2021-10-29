@@ -9,6 +9,41 @@ impl Board {
     self.0[coord.i][coord.j].clone()
   }
 
+  pub fn get_flipped(&self) -> Vec<Vec<Piece>> {
+    self
+      .clone()
+      .0
+      .into_iter()
+      .map(|piece_line| piece_line.into_iter().rev().collect::<Vec<piece::Piece>>())
+      .rev()
+      .collect::<Vec<_>>()
+  }
+
+  pub fn get_can_die_vec(&self, curr_player_move_vec: Vec<Coord>) -> Vec<Vec<bool>> {
+    self
+      .clone()
+      .0
+      .iter()
+      .map(|piece_line| {
+        piece_line
+          .iter()
+          .map(|piece| {
+            self.contains_move(piece.coord.i, piece.coord.j, curr_player_move_vec.clone())
+          })
+          .collect::<Vec<bool>>()
+      })
+      .collect::<Vec<Vec<bool>>>()
+  }
+
+  pub fn get_piece(&self, curr_player: piece::Colour, selected_pos: piece::Coord) -> Option<piece::Piece> {
+    self
+      .clone()
+      .0
+      .into_iter()
+      .flatten()
+      .find(|piece| piece.colour == curr_player && piece.coord == selected_pos)
+  }
+
   pub fn move_piece(&mut self, start: piece::Coord, end: piece::Coord) {
     let piece = &self.0[start.i][start.j];
 
@@ -32,17 +67,13 @@ impl Board {
     &self,
     ind: usize,
     jnd: usize,
-    curr_player_move_vec: Vec<Vec<piece::Coord>>,
+    curr_player_move_vec: Vec<piece::Coord>,
   ) -> bool {
-    // for piece_move in curr_player_move_vec.iter() {
-    for coord_vec in curr_player_move_vec.iter() {
-      for i in coord_vec.iter() {
-        if i == &(Coord { i: ind, j: jnd }) {
-          return true;
-        }
+    for coord in curr_player_move_vec.iter() {
+      if coord == &(Coord { i: ind, j: jnd }) {
+        return true;
       }
     }
-    // }
 
     return false;
   }

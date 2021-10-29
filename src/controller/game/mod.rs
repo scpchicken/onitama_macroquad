@@ -1,9 +1,6 @@
 use macroquad::prelude::*;
 
-use macroquad::ui::{
-  root_ui,
-  widgets::{Button, Label},
-};
+use macroquad::ui::root_ui;
 
 use ::rand::{seq::SliceRandom, thread_rng};
 use std::mem;
@@ -15,10 +12,10 @@ use crate::model::card;
 use crate::model::piece;
 use crate::view::graphics;
 
-#[derive(Debug, PartialEq)]
-struct Vecf {
-  i: f32,
-  j: f32,
+#[derive(Debug, PartialEq, Clone)]
+pub struct Vecf {
+  pub i: f32,
+  pub j: f32,
 }
 
 pub async fn start() {
@@ -41,7 +38,7 @@ pub async fn start() {
 
   let mut game_over = false;
 
-  let mut curr_player_move_vec: Vec<Vec<piece::Coord>> = vec![];
+  let mut curr_player_move_vec: Vec<piece::Coord> = vec![];
 
   let button_pos_vec = (0..5)
     .map(|ind| {
@@ -58,32 +55,20 @@ pub async fn start() {
   loop {
     clear_background(BLUE);
     if game_over {
-      graphics::draw_rect_label(250., 250., 100., 200., GRAY, format!("{:?} wins :O", opponent_player), vec2(250., 250.));
+      graphics::draw_rect_label(
+        250.,
+        250.,
+        100.,
+        200.,
+        GRAY,
+        format!("{:?} wins :O", opponent_player),
+        vec2(250., 250.),
+      );
     } else {
-      // let board::Board(board) = board;
-
-      let can_die_vec = board
-        .clone()
-        .0
-        .iter()
-        .map(|piece_line| {
-          piece_line
-            .iter()
-            .map(|piece| {
-              board.contains_move(piece.coord.i, piece.coord.j, curr_player_move_vec.clone())
-            })
-            .collect::<Vec<bool>>()
-        })
-        .collect::<Vec<Vec<bool>>>();
+      let can_die_vec = board.get_can_die_vec(curr_player_move_vec.clone());
 
       let board_vec = board.clone().0;
-      let board_vec_rev = board
-        .clone()
-        .0
-        .into_iter()
-        .map(|piece_line| piece_line.into_iter().rev().collect::<Vec<piece::Piece>>())
-        .rev()
-        .collect::<Vec<_>>();
+      let board_vec_rev = board.get_flipped();
 
       for (ind, piece_line) in (0..).zip(if curr_player == piece::Colour::Red {
         board_vec.iter()
@@ -91,47 +76,16 @@ pub async fn start() {
         board_vec_rev.iter()
       }) {
         for (jnd, piece) in (0..).zip(piece_line.iter()) {
-          let pos = &button_pos_vec[ind][jnd];
-          if Button::new(
-            image_hash[&match (piece.name, piece.colour) {
-              (piece::Name::Pawn, piece::Colour::Blue) => {
-                ["blue_pawn", "blue_pawn_select", "blue_pawn_dead"]
-              }
-
-              (piece::Name::Master, piece::Colour::Blue) => {
-                ["blue_king", "blue_king_select", "blue_king_dead"]
-              }
-
-              (piece::Name::Pawn, piece::Colour::Red) => {
-                ["red_pawn", "red_pawn_select", "red_pawn_dead"]
-              }
-
-              (piece::Name::Master, piece::Colour::Red) => {
-                ["red_king", "red_king_select", "red_king_dead"]
-              }
-
-              _ => ["empty", "empty", "empty_dead"],
-            }[if board.contains_move(
-              piece.coord.i,
-              piece.coord.j,
-              curr_player_move_vec.clone(),
-            ) {
-              2
-            } else if selected_pos
-              == (piece::Coord {
-                i: piece.coord.i,
-                j: piece.coord.j,
-              })
-            {
-              1
-            } else {
-              0
-            }]],
-          )
-          .size(vec2(50., 50.))
-          .position(vec2(pos.j, pos.i))
-          .ui(&mut *root_ui())
-          {
+          if graphics::piece_button(
+            selected_pos,
+            piece,
+            curr_player_move_vec.clone(),
+            board.clone(),
+            image_hash.clone(),
+            button_pos_vec.clone(),
+            ind,
+            jnd,
+          ) {
             if can_die_vec[piece.coord.i][piece.coord.j] {
               board.move_piece(
                 selected_pos,
@@ -159,14 +113,16 @@ pub async fn start() {
                 j: piece.coord.j,
               };
 
-              curr_player_move_vec = vec![];
+              let card = curr_player_card_vec[curr_select_card];
+              let selected_piece = board.get_piece(curr_player, selected_pos);
 
-              for piece_line in board.0.iter() {
-                for piece in piece_line.iter() {
-                  if piece.colour == curr_player && piece.coord == selected_pos {
-                    let card = curr_player_card_vec[curr_select_card];
-                    curr_player_move_vec.push(piece.get_move_vec(&board, card.value()))
-                  }
+              match selected_piece {
+                Some(piece) => {
+                  curr_player_move_vec = piece.get_move_vec(&board, card.value())
+                },
+
+                None => {
+                  curr_player_move_vec = vec![]
                 }
               }
             }
@@ -178,23 +134,21 @@ pub async fn start() {
 
       if root_ui().button(vec2(100., 400.), format!("{:?}", curr_player_card_vec[0])) {
         curr_select_card = 0;
-      }
-
-      if root_ui().button(vec2(200., 400.), format!("{:?}", curr_player_card_vec[1])) {
+      } else if root_ui().button(vec2(200., 400.), format!("{:?}", curr_player_card_vec[1])) {
         curr_select_card = 1;
       }
 
       if curr_select_card != old_select_card {
-        curr_player_move_vec = vec![];
+        let card = curr_player_card_vec[curr_select_card];
 
-        for piece_line in board.0.iter() {
-          for piece in piece_line.iter() {
-            if piece.colour == curr_player && piece.coord == selected_pos {
-              let card = curr_player_card_vec[curr_select_card];
+        let selected_piece = board.get_piece(curr_player, selected_pos);
 
-              curr_player_move_vec.push(piece.get_move_vec(&board, card.value()))
-            }
-          }
+        match selected_piece {
+          Some(piece) => {
+            curr_player_move_vec = piece.get_move_vec(&board, card.value());
+          },
+
+          None => {}
         }
       }
 

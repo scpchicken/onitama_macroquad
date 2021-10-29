@@ -27,32 +27,6 @@ impl fmt::Display for Piece {
   }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Copy)]
-pub enum Colour {
-  Red,
-  Blue,
-  Empty,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Copy)]
-pub struct Coord {
-  pub i: usize,
-  pub j: usize,
-}
-
-impl fmt::Display for Coord {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    write!(f, "({}, {})", self.i, self.j)
-  }
-}
-
-#[derive(Clone, Debug, Copy, PartialEq, Eq)]
-pub enum Name {
-  Master,
-  Pawn,
-  Empty,
-}
-
 impl Piece {
   pub fn get_move_vec(&self, board: &Board, card_val: Vec<Vec<CardItem>>) -> Vec<piece::Coord> {
     let mut move_vec: Vec<piece::Coord> = vec![];
@@ -91,4 +65,30 @@ impl Piece {
 
     move_vec
   }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Copy)]
+pub enum Colour {
+  Red,
+  Blue,
+  Empty,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Copy)]
+pub struct Coord {
+  pub i: usize,
+  pub j: usize,
+}
+
+impl fmt::Display for Coord {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "({}, {})", self.i, self.j)
+  }
+}
+
+#[derive(Clone, Debug, Copy, PartialEq, Eq)]
+pub enum Name {
+  Master,
+  Pawn,
+  Empty,
 }

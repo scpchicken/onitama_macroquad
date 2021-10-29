@@ -3,7 +3,6 @@ use strum_macros::EnumIter;
 use crate::model::card::{Card::*, CardItem::*};
 
 #[derive(Clone, Debug)]
-#[allow(dead_code)]
 pub enum CardItem {
   Empty,
   Middle,
