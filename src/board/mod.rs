@@ -1,8 +1,3 @@
-use itertools::Itertools;
-use std::io::{self, Write};
-use strum::IntoEnumIterator;
-
-use crate::card;
 use crate::card::*;
 use crate::global::*;
 use crate::{piece, piece::*};
@@ -42,8 +37,8 @@ impl Board {
     jnd: usize,
     curr_player_move_vec: Vec<(piece::Coord, Vec<(&Card, Vec<piece::Coord>)>)>,
   ) -> bool {
-    for (curr_player_piece_coord, piece_move) in curr_player_move_vec.iter() {
-      for (card, coord_vec) in piece_move.iter() {
+    for (_, piece_move) in curr_player_move_vec.iter() {
+      for (_, coord_vec) in piece_move.iter() {
         for i in coord_vec.iter() {
           if i == &(Coord { i: ind, j: jnd }) {
             // let mut bruh = card::Card::Dragon;
@@ -63,53 +58,6 @@ impl Board {
 
     return false;
   }
-
-  // pub fn valid_move(
-  //   &mut self,
-  //   curr_player_move_vec: Vec<(piece::Coord, Vec<(&Card, Vec<piece::Coord>)>)>,
-  // ) -> Result<(piece::Coord, piece::Coord, card::Card), &'static str> {
-  //   print!("enter your move: ");
-  //   io::stdout().flush().unwrap();
-
-  //   let player_move = super::input!();
-
-  //   if player_move.chars().all(|c| c.is_numeric()) && player_move.len() == 4 {
-  //     let player_move = player_move
-  //       .chars()
-  //       .map(|c| c.to_digit(10).unwrap() as usize)
-  //       .collect::<Vec<usize>>();
-  //     let (start_i, start_j, end_i, end_j) = player_move.iter().collect_tuple().unwrap();
-
-  //     let start_coord = piece::Coord {
-  //       i: *start_i,
-  //       j: *start_j,
-  //     };
-  //     let end_coord = piece::Coord {
-  //       i: *end_i,
-  //       j: *end_j,
-  //     };
-
-  //     for (curr_player_piece_coord, piece_move) in curr_player_move_vec.iter() {
-  //       for (card, coord_vec) in piece_move.iter() {
-  //         for i in coord_vec.iter() {
-  //           if curr_player_piece_coord == &start_coord && i == &end_coord {
-  //             let mut bruh = card::Card::Dragon;
-
-  //             for c in Card::iter() {
-  //               if &&c == card {
-  //                 bruh = c;
-  //               }
-  //             }
-
-  //             return Ok((start_coord.clone(), end_coord.clone(), bruh));
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   Err("invalid move or something")
-  // }
 
   pub fn contains(&self, colour: piece::Colour, name: piece::Name) -> bool {
     for piece_line in self.board.iter() {
