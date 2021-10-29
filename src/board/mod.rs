@@ -4,26 +4,21 @@ use crate::{piece, piece::*};
 #[derive(Clone)]
 pub struct Board(pub Vec<Vec<Piece>>);
 
-
 impl Board {
-  pub fn as_vec(&self) -> Vec<Vec<Piece>> {
-    self.0.clone()
-  }
-
   pub fn at_pos(&self, coord: piece::Coord) -> piece::Piece {
-    self.as_vec()[coord.i][coord.j].clone()
+    self.0[coord.i][coord.j].clone()
   }
 
   pub fn move_piece(&mut self, start: piece::Coord, end: piece::Coord) {
     let piece = &self.0[start.i][start.j];
 
-    self.as_vec()[end.i][end.j] = piece::Piece {
+    self.0[end.i][end.j] = piece::Piece {
       name: piece.name,
       colour: piece.colour,
       coord: piece::Coord { i: end.i, j: end.j },
     };
 
-    self.as_vec()[start.i][start.j] = piece::Piece {
+    self.0[start.i][start.j] = piece::Piece {
       name: piece::Name::Empty,
       colour: piece::Colour::Empty,
       coord: piece::Coord {
@@ -40,20 +35,20 @@ impl Board {
     curr_player_move_vec: Vec<Vec<piece::Coord>>,
   ) -> bool {
     // for piece_move in curr_player_move_vec.iter() {
-      for coord_vec in curr_player_move_vec.iter() {
-        for i in coord_vec.iter() {
-          if i == &(Coord { i: ind, j: jnd }) {
-            return true;
-          }
+    for coord_vec in curr_player_move_vec.iter() {
+      for i in coord_vec.iter() {
+        if i == &(Coord { i: ind, j: jnd }) {
+          return true;
         }
       }
+    }
     // }
 
     return false;
   }
 
   pub fn contains(&self, colour: piece::Colour, name: piece::Name) -> bool {
-    for piece_line in self.as_vec().iter() {
+    for piece_line in self.0.iter() {
       for piece in piece_line.iter() {
         if piece.name == name && piece.colour == colour {
           return true;

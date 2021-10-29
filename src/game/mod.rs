@@ -12,6 +12,7 @@ use strum::IntoEnumIterator;
 use crate::board;
 use crate::card;
 use crate::global::*;
+use crate::graphics;
 use crate::piece;
 
 #[derive(Debug, PartialEq)]
@@ -22,6 +23,7 @@ struct Vecf {
 
 pub async fn start() {
   let mut board = board::get_board();
+
   let mut card_vec: Vec<card::Card> = card::Card::iter().collect::<Vec<_>>();
   card_vec.shuffle(&mut thread_rng());
   let (mut player_one_card_vec, mut player_two_card_vec, mut middle_card) = (
@@ -30,34 +32,14 @@ pub async fn start() {
     &card_vec[4],
   );
 
-
   let mut curr_player = piece::Colour::Red;
   let mut opponent_player = piece::Colour::Blue;
 
-
-  let blue_pawn_image = load_texture("assets/blue_pawn.png").await.unwrap();
-  let blue_pawn_select_image = load_texture("assets/blue_pawn_select.png").await.unwrap();
-  let blue_pawn_dead_image = load_texture("assets/blue_pawn_dead.png").await.unwrap();
-
-  let blue_king_image = load_texture("assets/blue_king.png").await.unwrap();
-  let blue_king_select_image = load_texture("assets/blue_king_select.png").await.unwrap();
-  let blue_king_dead_image = load_texture("assets/blue_king_dead.png").await.unwrap();
-
-  let red_pawn_image = load_texture("assets/red_pawn.png").await.unwrap();
-  let red_pawn_select_image = load_texture("assets/red_pawn_select.png").await.unwrap();
-  let red_pawn_dead_image = load_texture("assets/red_pawn_dead.png").await.unwrap();
-
-  let red_king_image = load_texture("assets/red_king.png").await.unwrap();
-  let red_king_select_image = load_texture("assets/red_king_select.png").await.unwrap();
-  let red_king_dead_image = load_texture("assets/red_king_dead.png").await.unwrap();
-
-  let empty_image = load_texture("assets/empty.png").await.unwrap();
-  let empty_dead_image = load_texture("assets/empty_dead.png").await.unwrap();
+  let image_hash = graphics::get_image_hash().await;
 
   let mut curr_select_card = 0;
 
-  let mut way_of_stream = false;
-  let mut way_of_stone = false;
+  let mut game_over = false;
 
   let mut curr_player_move_vec: Vec<Vec<piece::Coord>> = vec![];
 
@@ -75,7 +57,7 @@ pub async fn start() {
 
   loop {
     clear_background(BLUE);
-    if way_of_stream || way_of_stone {
+    if game_over {
       draw_rectangle(250., 250., 100., 200., GRAY);
       Label::new(format!("{:?} wins :O", opponent_player))
         .position(vec2(250., 250.))
@@ -85,7 +67,7 @@ pub async fn start() {
 
       let can_die_vec = board
         .clone()
-        .as_vec()
+        .0
         .iter()
         .map(|piece_line| {
           piece_line
@@ -97,10 +79,10 @@ pub async fn start() {
         })
         .collect::<Vec<Vec<bool>>>();
 
-      let board_vec = board.clone().as_vec();
+      let board_vec = board.clone().0;
       let board_vec_rev = board
         .clone()
-        .as_vec()
+        .0
         .into_iter()
         .map(|piece_line| piece_line.into_iter().rev().collect::<Vec<piece::Piece>>())
         .rev()
@@ -114,36 +96,31 @@ pub async fn start() {
         for (jnd, piece) in (0..).zip(piece_line.iter()) {
           let pos = &button_pos_vec[ind][jnd];
           if Button::new(
-            match (piece.name, piece.colour) {
-              (piece::Name::Pawn, piece::Colour::Blue) => [
-                blue_pawn_image,
-                blue_pawn_select_image,
-                blue_pawn_dead_image,
-              ],
+            image_hash[&match (piece.name, piece.colour) {
+              (piece::Name::Pawn, piece::Colour::Blue) => {
+                ["blue_pawn", "blue_pawn_select", "blue_pawn_dead"]
+              }
 
-              (piece::Name::Master, piece::Colour::Blue) => [
-                blue_king_image,
-                blue_king_select_image,
-                blue_king_dead_image,
-              ],
+              (piece::Name::Master, piece::Colour::Blue) => {
+                ["blue_king", "blue_king_select", "blue_king_dead"]
+              }
 
               (piece::Name::Pawn, piece::Colour::Red) => {
-                [red_pawn_image, red_pawn_select_image, red_pawn_dead_image]
+                ["red_pawn", "red_pawn_select", "red_pawn_dead"]
               }
 
               (piece::Name::Master, piece::Colour::Red) => {
-                [red_king_image, red_king_select_image, red_king_dead_image]
+                ["red_king", "red_king_select", "red_king_dead"]
               }
 
-              _ => [empty_image, empty_image, empty_dead_image],
+              _ => ["empty", "empty", "empty_dead"],
             }[if board.contains_move(
               piece.coord.i,
               piece.coord.j,
               curr_player_move_vec.clone(),
             ) {
               2
-            }
-            else if selected_pos
+            } else if selected_pos
               == (piece::Coord {
                 i: piece.coord.i,
                 j: piece.coord.j,
@@ -152,15 +129,14 @@ pub async fn start() {
               1
             } else {
               0
-            }],
+            }]
+            .to_string()],
           )
           .size(vec2(50., 50.))
           .position(vec2(pos.j, pos.i))
           .ui(&mut *root_ui())
           {
-
             if can_die_vec[piece.coord.i][piece.coord.j] {
-
               board.move_piece(
                 selected_pos,
                 piece::Coord {
@@ -172,8 +148,8 @@ pub async fn start() {
               selected_pos = piece::Coord { i: 69, j: 69 };
               curr_player_move_vec = vec![];
 
-              way_of_stream = board.way_of_stream(curr_player);
-              way_of_stone = board.way_of_stone(curr_player, opponent_player);
+              game_over = board.way_of_stream(curr_player)
+                || board.way_of_stone(curr_player, opponent_player);
 
               mem::swap(&mut curr_player, &mut opponent_player);
               mem::swap(&mut player_one_card_vec[curr_select_card], &mut middle_card);
@@ -184,7 +160,9 @@ pub async fn start() {
                 j: piece.coord.j,
               };
 
-              for piece_line in board.as_vec().iter() {
+              curr_player_move_vec = vec![];
+
+              for piece_line in board.0.iter() {
                 for piece in piece_line.iter() {
                   if piece.colour == curr_player && piece.coord == selected_pos {
                     let card = player_one_card_vec[curr_select_card];
@@ -208,10 +186,9 @@ pub async fn start() {
       }
 
       if curr_select_card != old_select_card {
-
         curr_player_move_vec = vec![];
 
-        for piece_line in board.as_vec().iter() {
+        for piece_line in board.0.iter() {
           for piece in piece_line.iter() {
             if piece.colour == curr_player && piece.coord == selected_pos {
               let card = player_one_card_vec[curr_select_card];
