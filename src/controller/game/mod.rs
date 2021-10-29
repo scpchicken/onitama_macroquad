@@ -9,11 +9,11 @@ use ::rand::{seq::SliceRandom, thread_rng};
 use std::mem;
 use strum::IntoEnumIterator;
 
+use crate::global::*;
 use crate::model::board;
 use crate::model::card;
-use crate::global::*;
-use crate::view::graphics;
 use crate::model::piece;
+use crate::view::graphics;
 
 #[derive(Debug, PartialEq)]
 struct Vecf {
@@ -129,8 +129,7 @@ pub async fn start() {
               1
             } else {
               0
-            }]
-            .to_string()],
+            }]],
           )
           .size(vec2(50., 50.))
           .position(vec2(pos.j, pos.i))
@@ -152,7 +151,10 @@ pub async fn start() {
                 || board.way_of_stone(curr_player, opponent_player);
 
               mem::swap(&mut curr_player, &mut opponent_player);
-              mem::swap(&mut curr_player_card_vec[curr_select_card], &mut middle_card);
+              mem::swap(
+                &mut curr_player_card_vec[curr_select_card],
+                &mut middle_card,
+              );
               mem::swap(&mut curr_player_card_vec, &mut opponent_player_card_vec);
             } else {
               selected_pos = piece::Coord {
