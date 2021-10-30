@@ -1,5 +1,5 @@
+mod constants;
 mod controller;
-mod global;
 mod model;
 mod view;
 

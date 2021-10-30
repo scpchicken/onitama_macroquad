@@ -1,12 +1,11 @@
 use macroquad::prelude::*;
-
 use macroquad::ui::root_ui;
 
 use ::rand::{seq::SliceRandom, thread_rng};
 use std::mem;
 use strum::IntoEnumIterator;
 
-use crate::global::*;
+use crate::constants::*;
 use crate::model::board;
 use crate::model::card;
 use crate::model::piece;
@@ -29,8 +28,11 @@ pub async fn start() {
     &card_vec[4],
   );
 
-  let mut curr_player = piece::Colour::Red;
-  let mut opponent_player = piece::Colour::Blue;
+  let (mut curr_player, mut opponent_player) = if middle_card.colour() == piece::Colour::Blue {
+    (piece::Colour::Blue, piece::Colour::Red)
+  } else {
+    (piece::Colour::Red, piece::Colour::Blue)
+  };
 
   let image_hash = graphics::get_image_hash().await;
 
@@ -117,13 +119,9 @@ pub async fn start() {
               let selected_piece = board.get_piece(curr_player, selected_pos);
 
               match selected_piece {
-                Some(piece) => {
-                  curr_player_move_vec = piece.get_move_vec(&board, card.value())
-                },
+                Some(piece) => curr_player_move_vec = piece.get_move_vec(&board, card.value()),
 
-                None => {
-                  curr_player_move_vec = vec![]
-                }
+                None => curr_player_move_vec = vec![],
               }
             }
           }
@@ -136,6 +134,8 @@ pub async fn start() {
         curr_select_card = 0;
       } else if root_ui().button(vec2(200., 400.), format!("{:?}", curr_player_card_vec[1])) {
         curr_select_card = 1;
+      } else if is_key_pressed(KeyCode::S) {
+        curr_select_card ^= 1;
       }
 
       if curr_select_card != old_select_card {
@@ -146,7 +146,7 @@ pub async fn start() {
         match selected_piece {
           Some(piece) => {
             curr_player_move_vec = piece.get_move_vec(&board, card.value());
-          },
+          }
 
           None => {}
         }

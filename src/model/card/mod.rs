@@ -1,6 +1,7 @@
 use strum_macros::EnumIter;
 
-use crate::model::card::{Card::*, CardItem::*};
+use crate::model::card::Card::*;
+use crate::model::piece;
 
 #[derive(Clone, Debug)]
 pub enum CardItem {
@@ -87,13 +88,50 @@ impl Card {
     for (i, line) in (0..).zip(card_ref.iter()) {
       for (_, item) in (0..).zip(line.chars()) {
         card[i].push(match item {
-          'o' => Goto,
-          'O' => Middle,
-          _ => Empty,
+          'o' => CardItem::Goto,
+          'O' => CardItem::Middle,
+          _ => CardItem::Empty,
         })
       }
     }
 
     card
+  }
+
+  pub fn colour(&self) -> piece::Colour {
+    match self {
+      Bear => piece::Colour::Blue,
+      Boar => piece::Colour::Red,
+      Cobra => piece::Colour::Red,
+      Crab => piece::Colour::Blue,
+      Crane => piece::Colour::Blue,
+      Dog => piece::Colour::Blue,
+      Dragon => piece::Colour::Red,
+      Eel => piece::Colour::Blue,
+      Elephant => piece::Colour::Red,
+      Fox => piece::Colour::Red,
+      Frog => piece::Colour::Red,
+      Giraffe => piece::Colour::Blue,
+      Goose => piece::Colour::Blue,
+      Horse => piece::Colour::Red,
+      Igauna => piece::Colour::Red,
+      Kirin => piece::Colour::Red,
+      Mantis => piece::Colour::Red,
+      Monkey => piece::Colour::Blue,
+      Mouse => piece::Colour::Blue,
+      Otter => piece::Colour::Red,
+      Ox => piece::Colour::Blue,
+      Panda => piece::Colour::Red,
+      Phoenix => piece::Colour::Blue,
+      Rabbit => piece::Colour::Blue,
+      Rat => piece::Colour::Red,
+      Rooster => piece::Colour::Red,
+      Sable => piece::Colour::Blue,
+      SeaSnake => piece::Colour::Blue,
+      Tanuki => piece::Colour::Blue,
+      Tiger => piece::Colour::Blue,
+      Turtle => piece::Colour::Red,
+      Viper => piece::Colour::Red,
+    }
   }
 }

@@ -1,4 +1,4 @@
-use crate::global::*;
+use crate::constants::*;
 use crate::model::{piece, piece::*};
 
 #[derive(Clone)]
@@ -35,7 +35,11 @@ impl Board {
       .collect::<Vec<Vec<bool>>>()
   }
 
-  pub fn get_piece(&self, curr_player: piece::Colour, selected_pos: piece::Coord) -> Option<piece::Piece> {
+  pub fn get_piece(
+    &self,
+    curr_player: piece::Colour,
+    selected_pos: piece::Coord,
+  ) -> Option<piece::Piece> {
     self
       .clone()
       .0

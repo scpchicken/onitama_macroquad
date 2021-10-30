@@ -1,7 +1,7 @@
 use std::fmt;
 
-use crate::model::board::*;
-use crate::model::card::*;
+use crate::model::board;
+use crate::model::card;
 use crate::model::piece;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -28,13 +28,17 @@ impl fmt::Display for Piece {
 }
 
 impl Piece {
-  pub fn get_move_vec(&self, board: &Board, card_val: Vec<Vec<CardItem>>) -> Vec<piece::Coord> {
+  pub fn get_move_vec(
+    &self,
+    board: &board::Board,
+    card_val: Vec<Vec<card::CardItem>>,
+  ) -> Vec<piece::Coord> {
     let mut move_vec: Vec<piece::Coord> = vec![];
 
     for (i, line) in (0..).zip(card_val.iter()) {
       for (j, item) in (0..).zip(line.iter()) {
         match item {
-          CardItem::Goto => {
+          card::CardItem::Goto => {
             let offset_i = if self.colour == Colour::Blue {
               2 - i
             } else {
