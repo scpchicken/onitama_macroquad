@@ -39,20 +39,26 @@ pub async fn get_image_hash() -> HashMap<&'static str, Texture2D> {
   image_hash
 }
 
-pub fn draw_rect_label(
+pub fn draw_rect_text(
   rect_x: f32,
   rect_y: f32,
   rect_w: f32,
   rect_h: f32,
   rect_colour: Color,
   label_string: String,
+  font: Font,
 ) {
-  let label_pos = vec2(rect_x, rect_y);
-
   draw_rectangle(rect_x, rect_y, rect_w, rect_h, rect_colour);
-  Label::new(label_string)
-    .position(label_pos)
-    .ui(&mut *root_ui());
+  draw_text_ex(
+    &label_string,
+    rect_x,
+    rect_y,
+    TextParams {
+      font_size: 25,
+      font,
+      ..Default::default()
+    },
+  );
 }
 
 pub fn draw_card_info(
@@ -60,33 +66,35 @@ pub fn draw_card_info(
   opponent_player_card_vec: Vec<&card::Card>,
   middle_card: &card::Card,
   curr_select_card: usize,
-  image_hash: HashMap<&'static str, Texture2D>
+  image_hash: HashMap<&'static str, Texture2D>,
+  font: Font,
 ) {
-  draw_rect_label(
+  draw_rect_text(
     100.,
-    500.,
+    525.,
     200.,
     30.,
     GRAY,
     format!("Selected: {:?}", curr_player_card_vec[curr_select_card]),
+    font,
   );
 
-  Texture::new(
-    get_card_image(middle_card, image_hash.clone())
-  )
-  .size(100., 58.)
-  .position(vec2(400., 200.))
-  .ui(&mut *root_ui());
-  Texture::new(
-    get_card_image(opponent_player_card_vec[0], image_hash.clone())
-  )
+  Texture::new(get_card_image(middle_card, image_hash.clone()))
+    .size(100., 58.)
+    .position(vec2(400., 200.))
+    .ui(&mut *root_ui());
+  Texture::new(get_card_image(
+    opponent_player_card_vec[0],
+    image_hash.clone(),
+  ))
   .size(100., 58.)
   .position(vec2(100., 25.))
   .ui(&mut *root_ui());
 
-  Texture::new(
-    get_card_image(opponent_player_card_vec[1], image_hash.clone())
-  )
+  Texture::new(get_card_image(
+    opponent_player_card_vec[1],
+    image_hash.clone(),
+  ))
   .size(100., 58.)
   .position(vec2(225., 25.))
   .ui(&mut *root_ui());

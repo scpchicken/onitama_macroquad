@@ -37,11 +37,17 @@ pub async fn start() {
 
   let image_hash = graphics::get_image_hash().await;
 
+  // println!("{:#?}", image_hash);
+
   let mut curr_select_card = 0;
 
   let mut game_over = false;
 
   let mut curr_player_move_vec: Vec<piece::Coord> = vec![];
+
+  let font = load_ttf_font(r"fonts\MinimalPixel v2.ttf")
+    .await
+    .unwrap();
 
   let button_pos_vec = (0..5)
     .map(|ind| {
@@ -59,13 +65,14 @@ pub async fn start() {
     clear_background(BLANK);
 
     if game_over {
-      graphics::draw_rect_label(
+      graphics::draw_rect_text(
         250.,
         250.,
         100.,
         200.,
         GRAY,
         format!("{:?} wins :O", opponent_player),
+        font,
       );
     } else {
       let can_die_vec = board.get_can_die_vec(curr_player_move_vec.clone());
@@ -73,20 +80,46 @@ pub async fn start() {
       let board_vec = board.clone().0;
       let board_vec_rev = board.get_flipped();
 
-      let blue_temple_button_pos = button_pos_vec[BLUE_TEMPLE_ARCH_POS.i][BLUE_TEMPLE_ARCH_POS.j].clone();
-      let red_temple_button_pos = button_pos_vec[RED_TEMPLE_ARCH_POS.i][RED_TEMPLE_ARCH_POS.j].clone();
+      let blue_temple_button_pos =
+        button_pos_vec[BLUE_TEMPLE_ARCH_POS.i][BLUE_TEMPLE_ARCH_POS.j].clone();
+      let red_temple_button_pos =
+        button_pos_vec[RED_TEMPLE_ARCH_POS.i][RED_TEMPLE_ARCH_POS.j].clone();
 
       for (ind, piece_line) in (0..).zip(if curr_player == piece::Colour::Red {
         // button_pos_vec[BLUE_TEMPLE_ARCH_POS.i][BLUE_TEMPLE_ARCH_POS.j].i;
         // let blue_temple_arch_pos = button_pos_vec[BLUE_TEMPLE_ARCH_POS.i][BLUE_TEMPLE_ARCH_POS.j];
 
-        draw_rectangle(blue_temple_button_pos.j - 3.75, blue_temple_button_pos.i - 3.75, 57.5, 57.5, DARKBLUE);
-        draw_rectangle(red_temple_button_pos.j - 3.75, red_temple_button_pos.i - 3.75, 57.5, 57.5, MAROON);
+        draw_rectangle(
+          blue_temple_button_pos.j - 3.75,
+          blue_temple_button_pos.i - 3.75,
+          57.5,
+          57.5,
+          DARKBLUE,
+        );
+        draw_rectangle(
+          red_temple_button_pos.j - 3.75,
+          red_temple_button_pos.i - 3.75,
+          57.5,
+          57.5,
+          MAROON,
+        );
 
         board_vec.iter()
       } else {
-        draw_rectangle(red_temple_button_pos.j - 3.75, red_temple_button_pos.i - 3.75, 57.5, 57.5, DARKBLUE);
-        draw_rectangle(blue_temple_button_pos.j - 3.75, blue_temple_button_pos.i - 3.75, 57.5, 57.5, MAROON);
+        draw_rectangle(
+          red_temple_button_pos.j - 3.75,
+          red_temple_button_pos.i - 3.75,
+          57.5,
+          57.5,
+          DARKBLUE,
+        );
+        draw_rectangle(
+          blue_temple_button_pos.j - 3.75,
+          blue_temple_button_pos.i - 3.75,
+          57.5,
+          57.5,
+          MAROON,
+        );
 
         board_vec_rev.iter()
       }) {
@@ -184,7 +217,8 @@ pub async fn start() {
         opponent_player_card_vec.clone(),
         middle_card,
         curr_select_card,
-        image_hash.clone()
+        image_hash.clone(),
+        font,
       );
 
       if is_key_down(KeyCode::Escape) {

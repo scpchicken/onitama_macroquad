@@ -1,0 +1,11 @@
+E:\Documents\GitHub\mq\onitama\target\release\deps\unicode_segmentation-7b55216338be4ca9.rmeta: C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\lib.rs C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\grapheme.rs C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\tables.rs C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\word.rs C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\sentence.rs
+
+E:\Documents\GitHub\mq\onitama\target\release\deps\libunicode_segmentation-7b55216338be4ca9.rlib: C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\lib.rs C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\grapheme.rs C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\tables.rs C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\word.rs C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\sentence.rs
+
+E:\Documents\GitHub\mq\onitama\target\release\deps\unicode_segmentation-7b55216338be4ca9.d: C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\lib.rs C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\grapheme.rs C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\tables.rs C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\word.rs C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\sentence.rs
+
+C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\lib.rs:
+C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\grapheme.rs:
+C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\tables.rs:
+C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\word.rs:
+C:\Users\jorda\.cargo\registry\src\github.com-1ecc6299db9ec823\unicode-segmentation-1.8.0\src\sentence.rs:
