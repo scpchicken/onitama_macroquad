@@ -1,4 +1,4 @@
-use crate::constants::*;
+use crate::constant::*;
 use crate::model::{piece, piece::*};
 
 #[derive(Clone)]

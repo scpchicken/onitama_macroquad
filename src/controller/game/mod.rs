@@ -1,11 +1,12 @@
 use macroquad::prelude::*;
 use macroquad::ui::root_ui;
+use macroquad::ui::widgets::Button;
 
 use ::rand::{seq::SliceRandom, thread_rng};
 use std::mem;
 use strum::IntoEnumIterator;
 
-use crate::constants::*;
+use crate::constant::*;
 use crate::model::board;
 use crate::model::card;
 use crate::model::piece;
@@ -55,7 +56,8 @@ pub async fn start() {
   let mut selected_pos = piece::Coord { i: 69, j: 69 };
 
   loop {
-    clear_background(BLUE);
+    clear_background(BLANK);
+
     if game_over {
       graphics::draw_rect_label(
         250.,
@@ -64,7 +66,6 @@ pub async fn start() {
         200.,
         GRAY,
         format!("{:?} wins :O", opponent_player),
-        vec2(250., 250.),
       );
     } else {
       let can_die_vec = board.get_can_die_vec(curr_player_move_vec.clone());
@@ -72,9 +73,21 @@ pub async fn start() {
       let board_vec = board.clone().0;
       let board_vec_rev = board.get_flipped();
 
+      let blue_temple_button_pos = button_pos_vec[BLUE_TEMPLE_ARCH_POS.i][BLUE_TEMPLE_ARCH_POS.j].clone();
+      let red_temple_button_pos = button_pos_vec[RED_TEMPLE_ARCH_POS.i][RED_TEMPLE_ARCH_POS.j].clone();
+
       for (ind, piece_line) in (0..).zip(if curr_player == piece::Colour::Red {
+        // button_pos_vec[BLUE_TEMPLE_ARCH_POS.i][BLUE_TEMPLE_ARCH_POS.j].i;
+        // let blue_temple_arch_pos = button_pos_vec[BLUE_TEMPLE_ARCH_POS.i][BLUE_TEMPLE_ARCH_POS.j];
+
+        draw_rectangle(blue_temple_button_pos.j - 3.75, blue_temple_button_pos.i - 3.75, 57.5, 57.5, DARKBLUE);
+        draw_rectangle(red_temple_button_pos.j - 3.75, red_temple_button_pos.i - 3.75, 57.5, 57.5, MAROON);
+
         board_vec.iter()
       } else {
+        draw_rectangle(red_temple_button_pos.j - 3.75, red_temple_button_pos.i - 3.75, 57.5, 57.5, DARKBLUE);
+        draw_rectangle(blue_temple_button_pos.j - 3.75, blue_temple_button_pos.i - 3.75, 57.5, 57.5, MAROON);
+
         board_vec_rev.iter()
       }) {
         for (jnd, piece) in (0..).zip(piece_line.iter()) {
@@ -130,9 +143,23 @@ pub async fn start() {
 
       let old_select_card = curr_select_card;
 
-      if root_ui().button(vec2(100., 400.), format!("{:?}", curr_player_card_vec[0])) {
+      if Button::new(graphics::get_card_image(
+        curr_player_card_vec[0],
+        image_hash.clone(),
+      ))
+      .size(vec2(100., 58.))
+      .position(vec2(100., 400.))
+      .ui(&mut *root_ui())
+      {
         curr_select_card = 0;
-      } else if root_ui().button(vec2(200., 400.), format!("{:?}", curr_player_card_vec[1])) {
+      } else if Button::new(graphics::get_card_image(
+        curr_player_card_vec[1],
+        image_hash.clone(),
+      ))
+      .size(vec2(100., 58.))
+      .position(vec2(225., 400.))
+      .ui(&mut *root_ui())
+      {
         curr_select_card = 1;
       } else if is_key_pressed(KeyCode::S) {
         curr_select_card ^= 1;
@@ -157,6 +184,7 @@ pub async fn start() {
         opponent_player_card_vec.clone(),
         middle_card,
         curr_select_card,
+        image_hash.clone()
       );
 
       if is_key_down(KeyCode::Escape) {

@@ -1,6 +1,6 @@
 use strum_macros::EnumIter;
 
-use crate::model::card::Card::*;
+use crate::model::card;
 use crate::model::piece;
 
 #[derive(Clone, Debug)]
@@ -47,7 +47,9 @@ pub enum Card {
 }
 
 impl Card {
-  pub fn value(&self) -> Vec<Vec<CardItem>> {
+  pub fn value(&self) -> Vec<Vec<card::CardItem>> {
+    use crate::model::card::Card::*;
+
     let card_ref = match self {
       Bear => [".....", ".oo..", "..O..", "...o.", "....."],
       Boar => [".....", "..o..", ".oOo.", ".....", "....."],
@@ -83,14 +85,14 @@ impl Card {
       Viper => [".....", "..o..", "o.O..", "...o.", "....."],
     };
 
-    let mut card: Vec<Vec<CardItem>> = vec![vec![]; 5];
+    let mut card: Vec<Vec<card::CardItem>> = vec![vec![]; 5];
 
     for (i, line) in (0..).zip(card_ref.iter()) {
       for (_, item) in (0..).zip(line.chars()) {
         card[i].push(match item {
-          'o' => CardItem::Goto,
-          'O' => CardItem::Middle,
-          _ => CardItem::Empty,
+          'o' => card::CardItem::Goto,
+          'O' => card::CardItem::Middle,
+          _ => card::CardItem::Empty,
         })
       }
     }
@@ -99,6 +101,8 @@ impl Card {
   }
 
   pub fn colour(&self) -> piece::Colour {
+    use crate::model::card::Card::*;
+
     match self {
       Bear => piece::Colour::Blue,
       Boar => piece::Colour::Red,

@@ -1,7 +1,7 @@
 use macroquad::prelude::*;
 use macroquad::ui::{
   root_ui,
-  widgets::{Button, Label},
+  widgets::{Button, Label, Texture},
 };
 
 use regex::Regex;
@@ -21,7 +21,11 @@ pub async fn get_image_hash() -> HashMap<&'static str, Texture2D> {
   let mut image_hash: HashMap<&'static str, Texture2D> = HashMap::new();
 
   for image in image_vec {
-    let image_string = Box::leak(format!("{}", image.unwrap().path().display()).into_boxed_str());
+    let image_string = Box::leak(
+      format!("{}", image.unwrap().path().display())
+        .to_lowercase()
+        .into_boxed_str(),
+    );
     image_hash.insert(
       image_name_regex
         .captures(image_string)
@@ -42,8 +46,9 @@ pub fn draw_rect_label(
   rect_h: f32,
   rect_colour: Color,
   label_string: String,
-  label_pos: Vec2,
 ) {
+  let label_pos = vec2(rect_x, rect_y);
+
   draw_rectangle(rect_x, rect_y, rect_w, rect_h, rect_colour);
   Label::new(label_string)
     .position(label_pos)
@@ -55,44 +60,36 @@ pub fn draw_card_info(
   opponent_player_card_vec: Vec<&card::Card>,
   middle_card: &card::Card,
   curr_select_card: usize,
+  image_hash: HashMap<&'static str, Texture2D>
 ) {
   draw_rect_label(
     100.,
-    450.,
+    500.,
     200.,
     30.,
     GRAY,
     format!("Selected: {:?}", curr_player_card_vec[curr_select_card]),
-    vec2(100., 450.),
-  );
-  draw_rect_label(
-    400.,
-    200.,
-    200.,
-    30.,
-    GRAY,
-    format!("Middle card: {:?}", middle_card),
-    vec2(400., 200.),
   );
 
-  draw_rect_label(
-    100.,
-    25.,
-    format!("{:?}", opponent_player_card_vec[0]).len() as f32 * 10.,
-    30.,
-    GRAY,
-    format!("{:?}", opponent_player_card_vec[0]),
-    vec2(100., 25.),
-  );
-  draw_rect_label(
-    200.,
-    25.,
-    format!("{:?}", opponent_player_card_vec[1]).len() as f32 * 10.,
-    30.,
-    GRAY,
-    format!("{:?}", opponent_player_card_vec[1]),
-    vec2(200., 25.),
-  );
+  Texture::new(
+    get_card_image(middle_card, image_hash.clone())
+  )
+  .size(100., 58.)
+  .position(vec2(400., 200.))
+  .ui(&mut *root_ui());
+  Texture::new(
+    get_card_image(opponent_player_card_vec[0], image_hash.clone())
+  )
+  .size(100., 58.)
+  .position(vec2(100., 25.))
+  .ui(&mut *root_ui());
+
+  Texture::new(
+    get_card_image(opponent_player_card_vec[1], image_hash.clone())
+  )
+  .size(100., 58.)
+  .position(vec2(225., 25.))
+  .ui(&mut *root_ui());
 }
 
 pub fn get_image(
@@ -126,6 +123,19 @@ pub fn get_image(
   } else {
     0
   }]]
+}
+
+pub fn get_card_image(
+  card: &card::Card,
+  image_hash: HashMap<&'static str, Texture2D>,
+) -> Texture2D {
+  let card_string = format!("{:?}", card).to_lowercase();
+
+  image_hash[if card == &card::Card::SeaSnake {
+    "sea_snake"
+  } else {
+    card_string.as_str()
+  }]
 }
 
 pub fn piece_button<'a>(

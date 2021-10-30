@@ -1,4 +1,4 @@
-mod constants;
+mod constant;
 mod controller;
 mod model;
 mod view;

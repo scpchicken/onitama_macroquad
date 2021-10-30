@@ -39,16 +39,10 @@ impl Piece {
       for (j, item) in (0..).zip(line.iter()) {
         match item {
           card::CardItem::Goto => {
-            let offset_i = if self.colour == Colour::Blue {
-              2 - i
-            } else {
-              i - 2
-            } + self.coord.i as isize;
-            let offset_j = if self.colour == Colour::Blue {
-              2 - j
-            } else {
-              j - 2
-            } + self.coord.j as isize;
+            let piece_is_blue = self.colour == piece::Colour::Blue;
+
+            let offset_i = if piece_is_blue { 2 - i } else { i - 2 } + self.coord.i as isize;
+            let offset_j = if piece_is_blue { 2 - j } else { j - 2 } + self.coord.j as isize;
 
             if offset_i >= 0
               && offset_i < 5
