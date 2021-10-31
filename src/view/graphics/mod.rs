@@ -1,12 +1,11 @@
 use macroquad::prelude::*;
 use macroquad::ui::{
   root_ui,
-  widgets::{Button, Label, Texture},
+  widgets::{Button, Texture},
 };
 
 use regex::Regex;
 use std::collections::HashMap;
-use std::fs;
 
 use crate::controller::game;
 use crate::model::board;
@@ -16,16 +15,12 @@ use crate::view::graphics;
 
 pub async fn get_image_hash() -> HashMap<&'static str, Texture2D> {
   let image_name_regex = Regex::new(r"assets\\(.+?)\.png").unwrap();
-  let image_vec = fs::read_dir("assets").unwrap();
+  // let image_vec = fs::read_dir("assets").unwrap();
+  let image_vec = vec![r"assets\bear.png",r"assets\blue_king.png",r"assets\blue_king_dead.png",r"assets\blue_king_select.png",r"assets\blue_pawn.png",r"assets\blue_pawn_dead.png",r"assets\blue_pawn_select.png",r"assets\boar.png",r"assets\cobra.png",r"assets\crab.png",r"assets\crane.png",r"assets\dog.png",r"assets\dragon.png",r"assets\eel.png",r"assets\elephant.png",r"assets\empty.png",r"assets\empty_dead.png",r"assets\fox.png",r"assets\frog.png",r"assets\giraffe.png",r"assets\goose.png",r"assets\horse.png",r"assets\iguana.png",r"assets\kirin.png",r"assets\mantis.png",r"assets\monkey.png",r"assets\mouse.png",r"assets\otter.png",r"assets\ox.png",r"assets\panda.png",r"assets\phoenix.png",r"assets\rabbit.png",r"assets\rat.png",r"assets\red_king.png",r"assets\red_king_dead.png",r"assets\red_king_select.png",r"assets\red_pawn.png",r"assets\red_pawn_dead.png",r"assets\red_pawn_select.png",r"assets\rooster.png",r"assets\sable.png",r"assets\sea_snake.png",r"assets\tanuki.png",r"assets\tiger.png",r"assets\turtle.png",r"assets\viper.png"];
 
   let mut image_hash: HashMap<&'static str, Texture2D> = HashMap::new();
 
-  for image in image_vec {
-    let image_string = Box::leak(
-      format!("{}", image.unwrap().path().display())
-        .to_lowercase()
-        .into_boxed_str(),
-    );
+  for image_string in image_vec {
     image_hash.insert(
       image_name_regex
         .captures(image_string)
