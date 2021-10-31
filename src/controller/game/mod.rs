@@ -29,6 +29,10 @@ pub async fn start() {
     &card_vec[4],
   );
 
+  println!("{:#?}
+{:#?}
+{:#?}", curr_player_card_vec, opponent_player_card_vec, middle_card);
+
   let (mut curr_player, mut opponent_player) = if middle_card.colour() == piece::Colour::Blue {
     (piece::Colour::Blue, piece::Colour::Red)
   } else {
