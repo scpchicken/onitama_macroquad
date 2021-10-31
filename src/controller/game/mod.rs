@@ -69,15 +69,17 @@ pub async fn start() {
     clear_background(BLANK);
 
     if game_over {
-      graphics::draw_rect_text(
-        250.,
-        250.,
-        100.,
-        200.,
-        GRAY,
-        format!("{:?} wins :O", opponent_player),
+      draw_text_ex(
+      &format!("{:?} wins :O", opponent_player),
+      250.,
+      250.,
+      TextParams {
+        font_size: 25,
         font,
-      );
+        ..Default::default()
+      },
+    );
+
     } else {
       let can_die_vec = board.get_can_die_vec(curr_player_move_vec.clone());
 

@@ -81,28 +81,6 @@ pub async fn get_image_hash() -> HashMap<&'static str, Texture2D> {
   image_hash
 }
 
-pub fn draw_rect_text(
-  rect_x: f32,
-  rect_y: f32,
-  rect_w: f32,
-  rect_h: f32,
-  rect_colour: Color,
-  label_string: String,
-  font: Font,
-) {
-  draw_rectangle(rect_x, rect_y, rect_w, rect_h, rect_colour);
-  draw_text_ex(
-    &label_string,
-    rect_x,
-    rect_y,
-    TextParams {
-      font_size: 25,
-      font,
-      ..Default::default()
-    },
-  );
-}
-
 pub fn draw_card_info(
   curr_player_card_vec: Vec<&card::Card>,
   opponent_player_card_vec: Vec<&card::Card>,
@@ -111,14 +89,16 @@ pub fn draw_card_info(
   image_hash: HashMap<&'static str, Texture2D>,
   font: Font,
 ) {
-  draw_rect_text(
+
+  draw_text_ex(
+    &format!("Selected: {:?}", curr_player_card_vec[curr_select_card]),
     100.,
     525.,
-    200.,
-    30.,
-    GRAY,
-    format!("Selected: {:?}", curr_player_card_vec[curr_select_card]),
-    font,
+    TextParams {
+      font_size: 25,
+      font,
+      ..Default::default()
+    },
   );
 
   Texture::new(get_card_image(middle_card, image_hash.clone()))
