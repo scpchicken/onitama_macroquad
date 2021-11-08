@@ -1,2 +1,3 @@
 # onitama_macroquad
-onitama implementation in macroquad (couldn't get bevy, ggez, or amethyst working lol)
+Onitama implementation in macroquad game engine
+[Play it here](https://hydrazer.github.io/onitama_macroquad/)
