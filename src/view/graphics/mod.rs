@@ -96,7 +96,7 @@ pub fn draw_card_info(
     525.,
     TextParams {
       font_size: 25,
-      font,
+      font: Some(&font),
       ..Default::default()
     },
   );
@@ -152,7 +152,7 @@ pub fn get_image(
     1
   } else {
     0
-  }]]
+  }]].clone()
 }
 
 pub fn get_card_image(
@@ -165,7 +165,7 @@ pub fn get_card_image(
     "sea_snake"
   } else {
     card_string.as_str()
-  }]
+  }].clone()
 }
 
 pub fn piece_button<'a>(

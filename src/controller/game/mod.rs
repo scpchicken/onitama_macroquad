@@ -2,7 +2,7 @@ use macroquad::prelude::*;
 use macroquad::ui::root_ui;
 use macroquad::ui::widgets::Button;
 
-use ::rand::{seq::SliceRandom, thread_rng};
+use std::hash::{BuildHasher, Hasher, RandomState};
 use std::mem;
 use strum::IntoEnumIterator;
 
@@ -18,11 +18,25 @@ pub struct Vecf {
   pub j: f32,
 }
 
+fn rand() -> u64 {
+    RandomState::new().build_hasher().finish()
+}
+
+fn shuffle<T>(vec: &mut [T]) {
+    let n: usize = vec.len();
+    for i in 0..(n - 1) {
+        // Generate random index j, such that: i <= j < n
+        // The remainder (`%`) after division is always less than the divisor.
+        let j = (rand() as usize) % (n - i) + i;
+        vec.swap(i, j);
+    }
+}
+
 pub async fn start() {
   let mut board = board::get_board();
 
   let mut card_vec: Vec<card::Card> = card::Card::iter().collect::<Vec<_>>();
-  card_vec.shuffle(&mut thread_rng());
+  shuffle(&mut card_vec);
   let (mut curr_player_card_vec, mut opponent_player_card_vec, mut middle_card) = (
     vec![&card_vec[0], &card_vec[1]],
     vec![&card_vec[2], &card_vec[3]],
@@ -75,7 +89,7 @@ pub async fn start() {
       250.,
       TextParams {
         font_size: 25,
-        font,
+        font: Some(&font),
         ..Default::default()
       },
     );
@@ -224,7 +238,7 @@ pub async fn start() {
         middle_card,
         curr_select_card,
         image_hash.clone(),
-        font,
+        font.clone(),
       );
 
       if is_key_down(KeyCode::Escape) {
