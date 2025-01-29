@@ -104,8 +104,10 @@ impl Card {
     use crate::model::card::Card::*;
 
     match self {
-      Bear | Crab | Crane | Dog | Eel | Giraffe | Goose | Monkey | Mouse | Ox | Phoenix |Rabbit | Sable | SeaSnake | Tanuki | Tiger => piece::Colour::Blue,
-      Boar | Cobra | Dragon | Elephant | Fox | Frog | Horse | Iguana | Kirin | Mantis | Otter | Panda | Rat | Rooster | Turtle | Viper => piece::Colour::Red,
+      Bear | Crab | Crane | Dog | Eel | Giraffe | Goose | Monkey | Mouse | Ox | Phoenix
+      | Rabbit | Sable | SeaSnake | Tanuki | Tiger => piece::Colour::Blue,
+      Boar | Cobra | Dragon | Elephant | Fox | Frog | Horse | Iguana | Kirin | Mantis | Otter
+      | Panda | Rat | Rooster | Turtle | Viper => piece::Colour::Red,
     }
   }
 }

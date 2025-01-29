@@ -4,7 +4,6 @@ use macroquad::ui::{
   widgets::{Button, Texture},
 };
 
-use regex::Regex;
 use std::collections::HashMap;
 
 use crate::controller::game;
@@ -13,61 +12,28 @@ use crate::model::card;
 use crate::model::piece;
 use crate::view::graphics;
 
-pub async fn get_image_hash(font: Font) -> HashMap<&'static str, Texture2D> {
-  let image_name_regex = Regex::new(r"assets\\(.+?)\.png").unwrap();
+pub async fn get_image_hash(font: Font, card_vec: Vec<&card::Card>) -> HashMap<String, Texture2D> {
   // let image_vec = fs::read_dir("assets").unwrap();
-  let image_vec = vec![
-    r"assets\bear.png",
-    r"assets\blue_king.png",
-    r"assets\blue_king_dead.png",
-    r"assets\blue_king_select.png",
-    r"assets\blue_pawn.png",
-    r"assets\blue_pawn_dead.png",
-    r"assets\blue_pawn_select.png",
-    r"assets\boar.png",
-    r"assets\cobra.png",
-    r"assets\crab.png",
-    r"assets\crane.png",
-    r"assets\dog.png",
-    r"assets\dragon.png",
-    r"assets\eel.png",
-    r"assets\elephant.png",
-    r"assets\empty.png",
-    r"assets\empty_dead.png",
-    r"assets\fox.png",
-    r"assets\frog.png",
-    r"assets\giraffe.png",
-    r"assets\goose.png",
-    r"assets\horse.png",
-    r"assets\iguana.png",
-    r"assets\kirin.png",
-    r"assets\mantis.png",
-    r"assets\monkey.png",
-    r"assets\mouse.png",
-    r"assets\otter.png",
-    r"assets\ox.png",
-    r"assets\panda.png",
-    r"assets\phoenix.png",
-    r"assets\rabbit.png",
-    r"assets\rat.png",
-    r"assets\red_king.png",
-    r"assets\red_king_dead.png",
-    r"assets\red_king_select.png",
-    r"assets\red_pawn.png",
-    r"assets\red_pawn_dead.png",
-    r"assets\red_pawn_select.png",
-    r"assets\rooster.png",
-    r"assets\sable.png",
-    r"assets\sea_snake.png",
-    r"assets\tanuki.png",
-    r"assets\tiger.png",
-    r"assets\turtle.png",
-    r"assets\viper.png",
+  let image_req_vec = vec![
+    r"blue_king",
+    r"blue_king_dead",
+    r"blue_king_select",
+    r"blue_pawn",
+    r"blue_pawn_dead",
+    r"blue_pawn_select",
+    r"empty",
+    r"empty_dead",
+    r"red_king",
+    r"red_king_dead",
+    r"red_king_select",
+    r"red_pawn",
+    r"red_pawn_dead",
+    r"red_pawn_select",
   ];
 
-  let mut image_hash: HashMap<&'static str, Texture2D> = HashMap::new();
+  let mut image_hash: HashMap<String, Texture2D> = HashMap::new();
 
-  for image_string in image_vec {
+  for image in image_req_vec {
     clear_background(BLACK);
     draw_text_ex(
       &format!(
@@ -82,13 +48,34 @@ pub async fn get_image_hash(font: Font) -> HashMap<&'static str, Texture2D> {
         ..Default::default()
       },
     );
+
+    let path_str = format!("assets/{}.png", image);
+    image_hash.insert(image.to_string(), load_texture(&path_str).await.unwrap());
+    next_frame().await;
+  }
+
+  for card in card_vec {
+    clear_background(BLACK);
+    draw_text_ex(
+      &format!(
+        "Loading resources {}",
+        ".".repeat(((get_time() * 2.0) as usize) % 4)
+      ),
+      screen_width() / 2.0 - 160.0,
+      screen_height() / 2.0,
+      TextParams {
+        font_size: 25,
+        font: Some(&font),
+        ..Default::default()
+      },
+    );
+
+    let card_string = format!("{:?}", card).to_lowercase();
+
+    let path_str = format!("assets/{}.png", card_string);
     image_hash.insert(
-      image_name_regex
-        .captures(image_string)
-        .unwrap()
-        .get(1)
-        .map_or("", |m| m.as_str()),
-      load_texture(image_string).await.unwrap(),
+      card_string.to_string(),
+      load_texture(&path_str).await.unwrap(),
     );
     next_frame().await;
   }
@@ -101,10 +88,9 @@ pub fn draw_card_info(
   opponent_player_card_vec: Vec<&card::Card>,
   middle_card: &card::Card,
   curr_select_card: usize,
-  image_hash: HashMap<&'static str, Texture2D>,
+  image_hash: HashMap<String, Texture2D>,
   font: Font,
 ) {
-
   draw_text_ex(
     &format!("Selected: {:?}", curr_player_card_vec[curr_select_card]),
     100.,
@@ -142,9 +128,9 @@ pub fn get_image(
   piece: &piece::Piece,
   curr_player_move_vec: Vec<piece::Coord>,
   board: board::Board,
-  image_hash: HashMap<&'static str, Texture2D>,
+  image_hash: HashMap<String, Texture2D>,
 ) -> Texture2D {
-  image_hash[&match (piece.name, piece.colour) {
+  image_hash[match (piece.name, piece.colour) {
     (piece::Name::Pawn, piece::Colour::Blue) => ["blue_pawn", "blue_pawn_select", "blue_pawn_dead"],
 
     (piece::Name::Master, piece::Colour::Blue) => {
@@ -167,28 +153,22 @@ pub fn get_image(
     1
   } else {
     0
-  }]].clone()
+  }]]
+  .clone()
 }
 
-pub fn get_card_image(
-  card: &card::Card,
-  image_hash: HashMap<&'static str, Texture2D>,
-) -> Texture2D {
+pub fn get_card_image(card: &card::Card, image_hash: HashMap<String, Texture2D>) -> Texture2D {
   let card_string = format!("{:?}", card).to_lowercase();
 
-  image_hash[if card == &card::Card::SeaSnake {
-    "sea_snake"
-  } else {
-    card_string.as_str()
-  }].clone()
+  image_hash[card_string.as_str()].clone()
 }
 
-pub fn piece_button<'a>(
+pub fn piece_button(
   selected_pos: piece::Coord,
   piece: &piece::Piece,
   curr_player_move_vec: Vec<piece::Coord>,
   board: board::Board,
-  image_hash: HashMap<&'static str, Texture2D>,
+  image_hash: HashMap<String, Texture2D>,
   button_pos_vec: Vec<Vec<game::Vecf>>,
   ind: usize,
   jnd: usize,

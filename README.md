@@ -20,6 +20,5 @@ cargo install devserver
 ```bash
 cargo build --release --target wasm32-unknown-unknown
 cp target/wasm32-unknown-unknown/release/quadneo.wasm .
-wasm-strip web/fishgame.wasm
-devserver .
+devserver --path .
 ```

@@ -19,17 +19,17 @@ pub struct Vecf {
 }
 
 fn rand() -> u64 {
-    RandomState::new().build_hasher().finish()
+  RandomState::new().build_hasher().finish()
 }
 
 fn shuffle<T>(vec: &mut [T]) {
-    let n: usize = vec.len();
-    for i in 0..(n - 1) {
-        // Generate random index j, such that: i <= j < n
-        // The remainder (`%`) after division is always less than the divisor.
-        let j = (rand() as usize) % (n - i) + i;
-        vec.swap(i, j);
-    }
+  let n: usize = vec.len();
+  for i in 0..(n - 1) {
+    // Generate random index j, such that: i <= j < n
+    // The remainder (`%`) after division is always less than the divisor.
+    let j = (rand() as usize) % (n - i) + i;
+    vec.swap(i, j);
+  }
 }
 
 pub async fn start() {
@@ -43,9 +43,12 @@ pub async fn start() {
     &card_vec[4],
   );
 
-  println!("{:#?}
+  println!(
+    "{:#?}
 {:#?}
-{:#?}", curr_player_card_vec, opponent_player_card_vec, middle_card);
+{:#?}",
+    curr_player_card_vec, opponent_player_card_vec, middle_card
+  );
 
   let (mut curr_player, mut opponent_player) = if middle_card.colour() == piece::Colour::Blue {
     (piece::Colour::Blue, piece::Colour::Red)
@@ -53,11 +56,17 @@ pub async fn start() {
     (piece::Colour::Red, piece::Colour::Blue)
   };
 
-  let font = load_ttf_font(r"fonts\MinimalPixel v2.ttf")
-    .await
-    .unwrap();
+  let font = load_ttf_font(r"fonts\MinimalPixel v2.ttf").await.unwrap();
 
-  let image_hash = graphics::get_image_hash(font.clone()).await;
+  let card_vec_load = vec![
+    &card_vec[0],
+    &card_vec[1],
+    &card_vec[2],
+    &card_vec[3],
+    &card_vec[4],
+  ];
+
+  let image_hash = graphics::get_image_hash(font.clone(), card_vec_load).await;
 
   // println!("{:#?}", image_hash);
 
@@ -82,16 +91,15 @@ pub async fn start() {
 
     if game_over {
       draw_text_ex(
-      &format!("{:?} wins :O", opponent_player),
-      250.,
-      250.,
-      TextParams {
-        font_size: 25,
-        font: Some(&font),
-        ..Default::default()
-      },
-    );
-
+        &format!("{:?} wins :O", opponent_player),
+        250.,
+        250.,
+        TextParams {
+          font_size: 25,
+          font: Some(&font),
+          ..Default::default()
+        },
+      );
     } else {
       let can_die_vec = board.get_can_die_vec(curr_player_move_vec.clone());
 
@@ -200,15 +208,19 @@ pub async fn start() {
       ))
       .size(vec2(100., 58.))
       .position(vec2(100., 400.))
+      .selected(false)
       .ui(&mut *root_ui())
       {
         curr_select_card = 0;
-      } else if Button::new(graphics::get_card_image(
+      }
+
+      if Button::new(graphics::get_card_image(
         curr_player_card_vec[1],
         image_hash.clone(),
       ))
       .size(vec2(100., 58.))
       .position(vec2(225., 400.))
+      .selected(false)
       .ui(&mut *root_ui())
       {
         curr_select_card = 1;
