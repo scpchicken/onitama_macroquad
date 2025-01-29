@@ -53,19 +53,17 @@ pub async fn start() {
     (piece::Colour::Red, piece::Colour::Blue)
   };
 
-  let image_hash = graphics::get_image_hash().await;
+  let font = load_ttf_font(r"fonts\MinimalPixel v2.ttf")
+    .await
+    .unwrap();
+
+  let image_hash = graphics::get_image_hash(font.clone()).await;
 
   // println!("{:#?}", image_hash);
 
   let mut curr_select_card = 0;
-
   let mut game_over = false;
-
   let mut curr_player_move_vec: Vec<piece::Coord> = vec![];
-
-  let font = load_ttf_font(r"fonts\MinimalPixel v2.ttf")
-    .await
-    .unwrap();
 
   let button_pos_vec = (0..5)
     .map(|ind| {

@@ -13,7 +13,7 @@ use crate::model::card;
 use crate::model::piece;
 use crate::view::graphics;
 
-pub async fn get_image_hash() -> HashMap<&'static str, Texture2D> {
+pub async fn get_image_hash(font: Font) -> HashMap<&'static str, Texture2D> {
   let image_name_regex = Regex::new(r"assets\\(.+?)\.png").unwrap();
   // let image_vec = fs::read_dir("assets").unwrap();
   let image_vec = vec![
@@ -68,6 +68,20 @@ pub async fn get_image_hash() -> HashMap<&'static str, Texture2D> {
   let mut image_hash: HashMap<&'static str, Texture2D> = HashMap::new();
 
   for image_string in image_vec {
+    clear_background(BLACK);
+    draw_text_ex(
+      &format!(
+        "Loading resources {}",
+        ".".repeat(((get_time() * 2.0) as usize) % 4)
+      ),
+      screen_width() / 2.0 - 160.0,
+      screen_height() / 2.0,
+      TextParams {
+        font_size: 25,
+        font: Some(&font),
+        ..Default::default()
+      },
+    );
     image_hash.insert(
       image_name_regex
         .captures(image_string)
@@ -76,6 +90,7 @@ pub async fn get_image_hash() -> HashMap<&'static str, Texture2D> {
         .map_or("", |m| m.as_str()),
       load_texture(image_string).await.unwrap(),
     );
+    next_frame().await;
   }
 
   image_hash
